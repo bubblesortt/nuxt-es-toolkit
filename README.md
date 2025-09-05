@@ -1,0 +1,135 @@
+<!--
+Get your module up and running quickly.
+
+Find and replace all on all files (CMD+SHIFT+F):
+- Name: My Module
+- Package name: my-module
+- Description: My new Nuxt module
+-->
+
+# Nuxt-es-toolkit
+
+[![npm version][npm-version-src]][npm-version-href]
+[![npm downloads][npm-downloads-src]][npm-downloads-href]
+[![License][license-src]][license-href]
+[![Nuxt][nuxt-src]][nuxt-href]
+
+## 📦 Install
+
+1. Install `nuxt-es-toolkit` as development dependency:
+
+```bash
+npm i nuxt-es-toolkit -D
+```
+
+2. Add it to the `modules` section of your `nuxt.config`:
+
+```ts
+export default defineNuxtConfig({
+  modules: ["nuxt-es-toolkit"],
+});
+```
+3. Config it  if you need:
+```ts
+export default defineNuxtConfig({
+  modules: ["nuxt-es-toolkit"],
+  esToolkit: {
+    // your options here
+  }
+});
+``` 
+or
+```ts
+export default defineNuxtConfig({
+  modules: [
+    ["nuxt-es-toolkit",
+      {
+        // your options here
+      },
+    ],
+  ],
+});
+```
+
+## Example
+
+When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt application, they will be auto-imported
+
+```vue
+<script setup lang="ts">
+  const text = useUpperFirst("hello");
+</script>
+
+<template>
+  <div>{{ text }}</div>
+</template>
+```
+
+## Config
+
+| Name               | Default | Description                                                                           |
+| ------------------ |---------|---------------------------------------------------------------------------------------|
+| `prefix`           | `'use'` | String to prepend before each es-toolkit function (empty string to disable)           |
+| `exclude`          | `[]`    | Array of es-toolkit functions to exclude from auto imports                            |
+| `alias`            | `[]`    | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
+| `prefixSkip`       | `'is'`  | Functions that starts with this keywords will be skipped by prefix (false to disable) |
+
+## Config example 
+
+```ts
+export default defineNuxtConfig({
+  modules: ["nuxt-es-toolkit"],
+  esToolkit: {
+    prefix: "use",
+    prefixSkip: ["is"],
+    exclude: ["map", "find"],
+    alias: [
+      ["sum", "total"], // => useTotal
+      ["max", "maximum"], // => useMaximum
+      ["isDate", "isExactlyDate"], // => isExactlyDate
+    ],
+  },
+});
+```
+
+## Contribution
+
+<details>
+  <summary>Local development</summary>
+  
+  ```bash
+  # Install dependencies
+  npm install
+  
+  # Generate type stubs
+  npm run dev:prepare
+  
+  # Develop with the playground
+  npm run dev
+  
+  # Build the playground
+  npm run dev:build
+  
+  # Run ESLint
+  npm run lint
+  
+  # Run Vitest
+  npm run test
+  npm run test:watch
+  
+  # Release new version
+  npm run release
+  ```
+
+</details>
+
+
+<!-- Badges -->
+[npm-version-src]: https://img.shields.io/npm/v/my-module/latest.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-version-href]: https://npmjs.com/package/my-module
+
+[npm-downloads-src]: https://img.shields.io/npm/dm/my-module.svg?style=flat&colorA=020420&colorB=00DC82
+[npm-downloads-href]: https://npm.chart.dev/my-module
+
+[license-src]: https://img.shields.io/npm/l/my-module.svg?style=flat&colorA=020420&colorB=00DC82
+[license-href]: https://npmjs.com/package/my-module
