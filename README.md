@@ -1,13 +1,4 @@
-<!--
-Get your module up and running quickly.
-
-Find and replace all on all files (CMD+SHIFT+F):
-- Name: My Module
-- Package name: my-module
-- Description: My new Nuxt module
--->
-
-# Nuxt-es-toolkit
+# Nuxt-estoolkit
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -15,23 +6,23 @@ Find and replace all on all files (CMD+SHIFT+F):
 
 ## 📦 Install
 
-1. Install `nuxt-es-toolkit` as development dependency:
+1. Install `nuxt-estoolkit` as development dependency:
 
 ```bash
-npm i nuxt-es-toolkit -D
+npm i nuxt-estoolkit -D
 ```
 
 2. Add it to the `modules` section of your `nuxt.config`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-es-toolkit"],
+  modules: ["nuxt-estoolkit"],
 });
 ```
 3. Config it  if you need:
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-es-toolkit"],
+  modules: ["nuxt-estoolkit"],
   esToolkit: {
     // your options here
   }
@@ -41,7 +32,7 @@ or
 ```ts
 export default defineNuxtConfig({
   modules: [
-    ["nuxt-es-toolkit",
+    ["nuxt-estoolkit",
       {
         // your options here
       },
@@ -77,7 +68,7 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-es-toolkit"],
+  modules: ["nuxt-estoolkit"],
   esToolkit: {
     prefix: "use",
     prefixSkip: ["is"],

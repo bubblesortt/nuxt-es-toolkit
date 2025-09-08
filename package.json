@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-es-toolkit",
+  "name": "nuxt-estoolkit",
   "version": "1.0.1",
   "description": "Es-toolkit auto import module for Nuxt",
   "keywords": [
@@ -9,7 +9,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/BubbleSortt/nuxt-es-toolkit.git"
+    "url": "git+https://github.com/BubbleSortt/nuxt-estoolkit.git"
   },
   "author": {
     "name": "Alexandr Bychkin",
