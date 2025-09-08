@@ -37,7 +37,7 @@ export interface ModuleOptions {
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
-    name: 'nuxt-estoolkit',
+    name: 'nuxt-es-toolkit',
     configKey: 'esToolkit',
     compatibility: {
       nuxt: '>=3.0.0',

@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-estoolkit",
+  "name": "@bubblesortt/nuxt-es-toolkit",
   "version": "1.0.2",
   "description": "Es-toolkit auto import module for Nuxt",
   "keywords": [
@@ -9,11 +9,15 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BubbleSortt/nuxt-estoolkit.git"
+    "url": "git+https://github.com/BubbleSortt/nuxt-es-toolkit.git"
   },
+  "packageManager": "pnpm@10.15.1",
   "author": {
     "name": "Alexandr Bychkin",
     "email": "bubblesorttab@gmail.com"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "type": "module",

@@ -1,4 +1,4 @@
-# Nuxt-estoolkit
+# Nuxt-es-toolkit
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
@@ -6,23 +6,23 @@
 
 ## 📦 Install
 
-1. Install `nuxt-estoolkit` as development dependency:
+1. Install `@bubblesortt/nuxt-es-toolkit` as development dependency:
 
 ```bash
-npm i nuxt-estoolkit -D
+npm i @bubblesortt/nuxt-es-toolkit -D
 ```
 
 2. Add it to the `modules` section of your `nuxt.config`:
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-estoolkit"],
+  modules: ["nuxt-es-toolkit"],
 });
 ```
 3. Config it  if you need:
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-estoolkit"],
+  modules: ["nuxt-es-toolkit"],
   esToolkit: {
     // your options here
   }
@@ -32,7 +32,7 @@ or
 ```ts
 export default defineNuxtConfig({
   modules: [
-    ["nuxt-estoolkit",
+    ["nuxt-es-toolkit",
       {
         // your options here
       },
@@ -68,7 +68,7 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["nuxt-estoolkit"],
+  modules: ["nuxt-es-toolkit"],
   esToolkit: {
     prefix: "use",
     prefixSkip: ["is"],
