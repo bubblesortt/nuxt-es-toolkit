@@ -8,13 +8,13 @@
 
 ## 🪄 About
 A lightweight Nuxt 3 & 4 module that auto-imports functions from [es-toolkit](https://es-toolkit.dev) as Nuxt composables
-(optionally prefixed), with full TypeScript support.
+with full TypeScript support.
 
 ---
 
 ## ✨ Features
-- Auto-import all (or filtered) `es-toolkit` functions
-- Custom prefix (default `use`) or no prefix at all
+- Auto-import `es-toolkit` functions
+- Support custom prefix or no prefix at all
 - Skip prefix automatically for predicate-like names (`isX`) via `prefixSkip`
 - Alias any function with type-safe completions
 - Exclude unwanted functions
@@ -52,7 +52,7 @@ export default defineNuxtConfig({
   modules: ["@bubblesortt/nuxt-es-toolkit"],
 });
 ```
-3. Config it  if you need:
+3. Config it if you need:
 ```ts
 export default defineNuxtConfig({
   modules: ["@bubblesortt/nuxt-es-toolkit"],
