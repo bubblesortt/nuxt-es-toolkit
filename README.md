@@ -28,6 +28,13 @@ with full TypeScript support.
 
 ## 📦 Install
 
+Using nuxt cli
+```bash
+npx nuxt module add @bubblesortt/nuxt-es-toolki
+```
+
+or manual
+
 1. Install `@bubblesortt/nuxt-es-toolkit` as development dependency:
 
 Using npm:
@@ -99,7 +106,7 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 | `prefix`           | `'use'` | String to prepend before each es-toolkit function (empty string to disable)           |
 | `exclude`          | `[]`    | Array of es-toolkit functions to exclude from auto imports                            |
 | `alias`            | `[]`    | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
-| `prefixSkip`       | `'is'`  | Functions that starts with this keywords will be skipped by prefix (false to disable) |
+| `prefixSkip`       | `['is']`| Functions that starts with this keywords will be skipped by prefix (false to disable) |
 
 ---
 
