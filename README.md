@@ -30,7 +30,7 @@ with full TypeScript support.
 
 Using nuxt cli
 ```bash
-npx nuxt module add @bubblesortt/nuxt-es-toolki
+npx nuxt module add @bubblesortt/nuxt-es-toolkit
 ```
 
 or manual
