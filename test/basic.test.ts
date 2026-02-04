@@ -12,4 +12,12 @@ describe('ssr', async () => {
     const html = await $fetch('/')
     expect(html).toContain('<div>basic</div>')
   })
+
+  it('renders values from auto-imported methods', async () => {
+    const html = await $fetch('/')
+    expect(html).toContain('<div id="sum">5</div>')
+    expect(html).toContain('<div id="chunk">[[1,2],[3,4]]</div>')
+    expect(html).toContain('<div id="not-nil">false</div>')
+    expect(html).toContain('<div id="upper">Hello</div>')
+  })
 })

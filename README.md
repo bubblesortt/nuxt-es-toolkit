@@ -101,12 +101,15 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 
 ## ⚙️ Config
 
-| Name               | Default | Description                                                                           |
-| ------------------ |---------|---------------------------------------------------------------------------------------|
-| `prefix`           | `'use'` | String to prepend before each es-toolkit function (empty string to disable)           |
-| `exclude`          | `[]`    | Array of es-toolkit functions to exclude from auto imports                            |
-| `alias`            | `[]`    | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
-| `prefixSkip`       | `['is']`| Functions that starts with this keywords will be skipped by prefix (false to disable) |
+| Name               | Default    | Description                                                                           |
+| ------------------ |------------|---------------------------------------------------------------------------------------|
+| `compat`           | `'prefer'` | `'prefer'` = compat when available, `'only'`/`true` = compat only, `false` = base only |
+| `compatMethods`    | `[]`       | Methods to force import from `es-toolkit/compat`                                      |
+| `baseMethods`      | `[]`       | Methods to force import from base `es-toolkit`                                        |
+| `prefix`           | `'use'`    | String to prepend before each es-toolkit function (empty string to disable)           |
+| `exclude`          | `[]`       | Array of es-toolkit functions to exclude from auto imports                            |
+| `alias`            | `[]`       | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
+| `prefixSkip`       | `['is']`   | Functions that starts with this keywords will be skipped by prefix (false to disable) |
 
 ---
 
@@ -116,6 +119,9 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 export default defineNuxtConfig({
   modules: ["@bubblesortt/nuxt-es-toolkit"],
   esToolkit: {
+    compat: "only",
+    compatMethods: ["get"],
+    baseMethods: ["map"],
     prefix: "use",
     prefixSkip: ["is"],
     exclude: ["map", "find"],
