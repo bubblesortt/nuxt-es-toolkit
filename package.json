@@ -1,6 +1,6 @@
 {
   "name": "@bubblesortt/nuxt-es-toolkit",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Es-toolkit auto import module for Nuxt",
   "keywords": [
     "nuxt",
