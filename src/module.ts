@@ -48,7 +48,8 @@ export interface ModuleOptions {
   /**
    * Prefix to be added before every es-toolkit function
    *
-   * `' '` to disable uppercasing
+   * An empty string (or any blank/whitespace value) disables the prefix
+   * and keeps each function's original casing.
    *
    * @defaultValue `use`
    * @example prefix: 'use'
@@ -57,10 +58,13 @@ export interface ModuleOptions {
   /**
    * Functions that starts with this keywords will be skipped by prefix
    *
+   * Pass `false` or an empty array to disable prefix-skipping entirely, so every
+   * function (including `is*`) receives the prefix.
+   *
    * @defaultValue ['is']
    * @example prefixSkip: ['is', 'has']
    */
-  prefixSkip: string[]
+  prefixSkip?: string[] | false
 }
 
 export default defineNuxtModule<ModuleOptions>({
@@ -78,7 +82,10 @@ export default defineNuxtModule<ModuleOptions>({
     exclude: [],
     alias: [],
     prefix: 'use',
-    prefixSkip: ['is'],
+    // `prefixSkip` is intentionally absent from `defaults`: Nuxt merges module
+    // options with `defu`, which drops empty arrays and concatenates arrays with
+    // the default. Declaring it here would break `prefixSkip: []` and surprise
+    // users who pass their own list. The `['is']` default is applied in `setup`.
   },
   setup(_options, _nuxt) {
     const { resolve } = createResolver(import.meta.url)
@@ -138,14 +145,21 @@ export default defineNuxtModule<ModuleOptions>({
     const compatExports = new Set(Object.keys(toolkitCompatAll as ToolkitModule))
     const baseExports = new Set(Object.keys(toolkitBase as ToolkitModule))
 
-    const prefixSkip = toArray(_options.prefixSkip || [])
+    const prefixSkip = _options.prefixSkip === undefined
+      ? ['is']
+      : _options.prefixSkip === false
+        ? []
+        : toArray(_options.prefixSkip)
     const aliasMap = new Map<string, string>(_options.alias)
     const excludes = [..._options.exclude, ...excludeDefault]
     for (const name of Object.keys(toolkit)) {
       if (!excludes.includes(name)) {
         const alias = aliasMap.has(name) ? String(aliasMap.get(name)) : name
         const isSkipPrefix = prefixSkip.some(prefix => alias.startsWith(prefix))
-        const prefix = isSkipPrefix ? '' : _options.prefix || ''
+        // A blank/whitespace prefix disables the prefix (and uppercasing),
+        // keeping each function's original name. Trimming also guards against
+        // accidental surrounding whitespace, which would produce invalid identifiers.
+        const prefix = isSkipPrefix ? '' : (_options.prefix || '').trim()
         const as = prefix ? `${prefix}${upperFirst(alias)}` : alias
         let from = defaultEntry
         if (compatOnly.has(name) && compatExports.has(name)) {
