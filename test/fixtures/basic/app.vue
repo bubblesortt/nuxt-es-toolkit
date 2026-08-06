@@ -15,8 +15,8 @@
 </template>
 
 <script setup>
-const sum = useAdd(2, 3)
-const chunkText = JSON.stringify(useChunk([1, 2, 3, 4], 2))
-const notNil = isNotNil(null)
-const upper = useUpperFirst('hello')
+const sum = etSum([2, 3])
+const chunkText = JSON.stringify(etChunk([1, 2, 3, 4], 2))
+const notNil = etIsNotNil(null)
+const upper = etUpperFirst('hello')
 </script>

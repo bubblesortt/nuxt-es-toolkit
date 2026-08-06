@@ -1,7 +1,7 @@
 <script setup>
-const fpMapped = useFpMap(value => value * 2)([1, 2])
-const mapFiltered = [...useMapFilter(new Map([['a', 1], ['b', 2]]), value => value > 1)]
-const setMapped = [...useSetMap(new Set([1, 2]), value => value * 3)]
+const fpMapped = etFpMap(value => value * 2)([1, 2])
+const mapFiltered = [...etMapFilter(new Map([['a', 1], ['b', 2]]), value => value > 1)]
+const setMapped = [...etSetMap(new Set([1, 2]), value => value * 3)]
 </script>
 
 <template>
