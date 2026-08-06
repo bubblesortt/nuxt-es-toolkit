@@ -4,6 +4,16 @@
 
 Prepare a locally verified release train that modernizes dependencies, makes auto-import generation predictable, expands opt-in functionality, and provides a clean migration path for safer defaults. Work stays local: do not bump the package version, create tags, publish to npm, push branches, or run the `release` script.
 
+## Execution Status — 2026-08-07
+
+- [x] v1.0.12 maintenance foundation
+- [x] v1.1.0 import controls and validation
+- [x] v1.2.0 opt-in FP, Map, and Set entrypoints
+- [x] v2.0.0 compat semantics, safer defaults, and migration guide
+- [x] Full quality gate, production audit, package inspection, and packed Nuxt 3/4 consumer builds
+
+TypeScript 7 remains deferred until `@nuxt/module-builder` declares support. `es-toolkit/server` remains deferred until a dedicated Nuxt server-only API is designed and tested. No version bump, release commit, tag, publication, push, or other remote operation was performed.
+
 Each release branch is stacked on the previous one so it can later be merged and released in order:
 
 1. `feature/v1.0.12-maintenance` from `main`
