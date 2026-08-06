@@ -20,5 +20,7 @@ export const readImports = () => {
   return readFileSync(first, 'utf8')
 }
 
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
 export const findImportLine = (imports: string, identifier: string) =>
-  imports.split('\n').find(line => line.includes(identifier))
+  imports.split('\n').find(line => new RegExp(`(?<![$\\w])${escapeRegExp(identifier)}(?![$\\w])`).test(line))
