@@ -5,13 +5,11 @@ export interface ToolkitModule {
 }
 
 export interface ImportEntries {
-  prefer: string
   compat: string
   base: string
 }
 
 export interface ImportSurfaces {
-  prefer: ToolkitModule
   compat: ToolkitModule
   base: ToolkitModule
 }
@@ -135,18 +133,6 @@ export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
     }
   }
 
-  const defaultSurface = options.compatMode === 'only'
-    ? options.surfaces.compat
-    : options.compatMode === false
-      ? options.surfaces.base
-      : options.surfaces.prefer
-  const defaultEntry = options.compatMode === 'only'
-    ? options.entries.compat
-    : options.compatMode === false
-      ? options.entries.base
-      : options.entries.prefer
-  const defaultExports = new Set(Object.keys(defaultSurface))
-
   interface ImportCandidate {
     key: string
     name: string
@@ -155,8 +141,17 @@ export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
   }
 
   const candidates = new Map<string, ImportCandidate>()
-  for (const name of defaultExports) {
-    candidates.set(name, { key: name, name, defaultAlias: name, from: defaultEntry })
+  if (options.compatMode !== false) {
+    for (const name of compatExports) {
+      candidates.set(name, { key: name, name, defaultAlias: name, from: options.entries.compat })
+    }
+  }
+  if (options.compatMode !== 'only') {
+    for (const name of baseExports) {
+      if (options.compatMode === false || !candidates.has(name)) {
+        candidates.set(name, { key: name, name, defaultAlias: name, from: options.entries.base })
+      }
+    }
   }
   for (const name of compatMethods) {
     candidates.set(name, { key: name, name, defaultAlias: name, from: options.entries.compat })
