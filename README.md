@@ -20,6 +20,7 @@ with full TypeScript support.
 - Skip prefix automatically for predicate-like names (`isX`) via `prefixSkip`
 - Alias any function with type-safe completions
 - Limit registration to an explicit `include` allowlist
+- Opt into qualified FP, Map, and Set helpers without name collisions
 - Exclude unwanted functions
 - Generated `.d.ts` for IDE autocomplete
 - Tree-shaking friendly (import only what you use)
@@ -115,6 +116,7 @@ const text = useUpperFirst('hello')
 | `compat`           | `'prefer'` | `'prefer'` = compat when available, `'only'`/`true` = compat only, `false` = base only |
 | `compatMethods`    | `[]`       | Methods to force import from `es-toolkit/compat`                                      |
 | `baseMethods`      | `[]`       | Methods to force import from base `es-toolkit`                                        |
+| `entrypoints`      | `[]`       | Optional `fp`, `map`, and `set` export surfaces                                       |
 | `include`          | `undefined` | Optional allowlist of methods to register (`[]` registers none)                       |
 | `prefix`           | `'use'`    | String to prepend before each es-toolkit function (empty string to disable)           |
 | `exclude`          | `[]`       | Array of es-toolkit functions to exclude from auto imports                            |
@@ -156,6 +158,30 @@ export default defineNuxtConfig({
 ```
 
 When `include` is present, per-method overrides must also appear in the allowlist. Explicitly included methods may opt into exports normally omitted from broad registration. Invalid included methods, conflicting source overrides, invalid aliases, and duplicate generated names stop setup with an actionable error; unknown `exclude` and alias sources produce warnings.
+
+## Optional entrypoints
+
+Non-root APIs are disabled by default. Enable only the surfaces your application needs:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['@bubblesortt/nuxt-es-toolkit'],
+  esToolkit: {
+    entrypoints: ['fp', 'map', 'set'],
+    include: ['fp.map', 'map.filter', 'set.map'],
+  },
+})
+```
+
+Qualified configuration names become collision-resistant auto-imports:
+
+| Configuration name | Auto-import     | Source             |
+| ------------------ | --------------- | ------------------ |
+| `fp.map`           | `useFpMap`      | `es-toolkit/fp`    |
+| `map.filter`       | `useMapFilter`  | `es-toolkit/map`   |
+| `set.map`          | `useSetMap`     | `es-toolkit/set`   |
+
+Aliases and exclusions also use qualified names, such as `alias: [['fp.map', 'functionalMap']]` and `exclude: ['set.map']`. FP helpers use data-last signatures; Map and Set helpers operate on their respective collection types. `es-toolkit/types` has no runtime exports, and Node-only `es-toolkit/server` helpers are intentionally not registered as client auto-imports.
 
 ---
 
