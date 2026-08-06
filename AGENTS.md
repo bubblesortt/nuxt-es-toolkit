@@ -8,7 +8,7 @@ Use `playground/` as the local Nuxt application for manual verification. Automat
 
 ## Build, Test, and Development Commands
 
-This project uses Node 20 in CI and pnpm 10 (see `packageManager`). Enable Corepack, then run `pnpm install`.
+This project tests supported Node 20 and 24 releases in CI and pins pnpm 10 (see `packageManager`). Enable Corepack, then run `pnpm install --frozen-lockfile`.
 
 - `pnpm dev:prepare`: build module stubs and prepare Nuxt types; run before development or tests.
 - `pnpm dev`: prepare the module, then start the playground.
@@ -17,6 +17,7 @@ This project uses Node 20 in CI and pnpm 10 (see `packageManager`). Enable Corep
 - `pnpm test`: run the Vitest suite once; `pnpm test:watch` watches locally.
 - `pnpm test:types`: type-check both the module and playground.
 - `pnpm prepack`: create the publishable module in `dist/`.
+- `pnpm test:package`: validate the built package with publint.
 
 Run one test with `pnpm vitest run test/options.test.ts` or filter by name with `pnpm vitest run -t "renders the index page"`.
 
