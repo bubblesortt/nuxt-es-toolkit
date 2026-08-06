@@ -65,7 +65,7 @@ export default defineNuxtConfig({
 })
 ```
 
-3. Config it if you need:
+3. Configure it if needed:
 
 ```ts
 export default defineNuxtConfig({
@@ -99,7 +99,7 @@ When you use [es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applica
 
 ```vue
 <script setup lang="ts">
-const text = useUpperFirst('hello')
+const text = etUpperFirst('hello')
 </script>
 
 <template>
@@ -113,15 +113,15 @@ const text = useUpperFirst('hello')
 
 | Name               | Default    | Description                                                                           |
 | ------------------ |------------|---------------------------------------------------------------------------------------|
-| `compat`           | `'prefer'` | `'prefer'` = compat when available, `'only'`/`true` = compat only, `false` = base only |
+| `compat`           | `false`    | `'prefer'` = compat when available, `'only'`/`true` = compat only, `false` = base only |
 | `compatMethods`    | `[]`       | Methods to force import from `es-toolkit/compat`                                      |
 | `baseMethods`      | `[]`       | Methods to force import from base `es-toolkit`                                        |
 | `entrypoints`      | `[]`       | Optional `fp`, `map`, and `set` export surfaces                                       |
 | `include`          | `undefined` | Optional allowlist of methods to register (`[]` registers none)                       |
-| `prefix`           | `'use'`    | String to prepend before each es-toolkit function (empty string to disable)           |
+| `prefix`           | `'et'`     | String to prepend before each es-toolkit function (empty string to disable)           |
 | `exclude`          | `[]`       | Array of es-toolkit functions to exclude from auto imports                            |
 | `alias`            | `[]`       | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
-| `prefixSkip`       | `['is']`   | Functions that starts with this keywords will be skipped by prefix (`false` or `[]` to disable) |
+| `prefixSkip`       | `false`    | Name starts that skip the prefix (`false` or `[]` prefixes every utility)              |
 
 ---
 
@@ -177,9 +177,9 @@ Qualified configuration names become collision-resistant auto-imports:
 
 | Configuration name | Auto-import     | Source             |
 | ------------------ | --------------- | ------------------ |
-| `fp.map`           | `useFpMap`      | `es-toolkit/fp`    |
-| `map.filter`       | `useMapFilter`  | `es-toolkit/map`   |
-| `set.map`          | `useSetMap`     | `es-toolkit/set`   |
+| `fp.map`           | `etFpMap`       | `es-toolkit/fp`    |
+| `map.filter`       | `etMapFilter`   | `es-toolkit/map`   |
+| `set.map`          | `etSetMap`      | `es-toolkit/set`   |
 
 Aliases and exclusions also use qualified names, such as `alias: [['fp.map', 'functionalMap']]` and `exclude: ['set.map']`. FP helpers use data-last signatures; Map and Set helpers operate on their respective collection types. `es-toolkit/types` has no runtime exports, and Node-only `es-toolkit/server` helpers are intentionally not registered as client auto-imports.
 
@@ -202,6 +202,8 @@ Aliases and exclusions also use qualified names, such as `alias: [['fp.map', 'fu
 ## ✅ Compatibility
 
 CI verifies the module against Nuxt 3.21 on Node 20 and Nuxt 4.5 on Node 24. The package supports Node `^20.19.0 || >=22.12.0`; each Nuxt major may impose a narrower Node range.
+
+Upgrading from v1 changes import sources and generated names. Follow the [v2 migration guide](./MIGRATION.md) before upgrading.
 
 ---
 
