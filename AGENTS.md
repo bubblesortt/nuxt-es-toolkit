@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`src/module.ts` defines the Nuxt module, its public options, and auto-import registration. `src/runtime/` contains the three static `es-toolkit` export surfaces (base, compat-only, and compat-preferred); update these deliberately when changing import resolution. Shared helpers live in `src/utils/`.
+`src/module.ts` defines the Nuxt module and its public options. `src/utils/imports.ts` plans and validates auto-imports independently of Nuxt. `src/runtime/` contains the three static `es-toolkit` export surfaces (base, compat-only, and compat-preferred); update these deliberately when changing import resolution. Shared helpers live in `src/utils/`.
 
 Use `playground/` as the local Nuxt application for manual verification. Automated tests live in `test/`, with minimal Nuxt apps under `test/fixtures/` and shared assertions in `test/utils/`. Generated directories such as `dist/`, `.nuxt/`, and `.output/` are ignored and must not be committed.
 
