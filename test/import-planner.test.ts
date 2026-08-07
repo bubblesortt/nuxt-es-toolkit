@@ -10,6 +10,12 @@ const compat = {
   add: () => {},
   chunk: () => {},
 }
+const fp = {
+  map: () => {},
+}
+const map = {
+  filter: () => {},
+}
 
 const createOptions = (overrides: Partial<PlanImportsOptions> = {}): PlanImportsOptions => ({
   compatMode: 'prefer',
@@ -102,5 +108,41 @@ describe('import planner', () => {
 
     expect(warn).toHaveBeenCalledWith('Unknown exclude entry "missing-exclude"; it will be ignored.')
     expect(warn).toHaveBeenCalledWith('Unknown alias source "missing-alias"; it will be ignored.')
+  })
+
+  it('plans enabled entrypoints with qualified names', () => {
+    const imports = planImports(createOptions({
+      entrypoints: [
+        { name: 'fp', enabled: true, exports: fp, entry: '/fp' },
+        { name: 'map', enabled: true, exports: map, entry: '/map' },
+      ],
+      include: ['fp.map', 'map.filter'],
+    }))
+
+    expect(imports).toEqual([
+      { name: 'map', as: 'useFpMap', from: '/fp' },
+      { name: 'filter', as: 'useMapFilter', from: '/map' },
+    ])
+  })
+
+  it('applies qualified aliases and exclusions', () => {
+    const imports = planImports(createOptions({
+      entrypoints: [
+        { name: 'fp', enabled: true, exports: fp, entry: '/fp' },
+        { name: 'map', enabled: true, exports: map, entry: '/map' },
+      ],
+      exclude: ['map.filter'],
+      alias: [['fp.map', 'functionalMap']],
+    }))
+
+    expect(imports).toContainEqual({ name: 'map', as: 'useFunctionalMap', from: '/fp' })
+    expect(imports).not.toContainEqual(expect.objectContaining({ from: '/map' }))
+  })
+
+  it('rejects included methods from disabled entrypoints', () => {
+    expect(() => planImports(createOptions({
+      entrypoints: [{ name: 'fp', enabled: false, exports: fp, entry: '/fp' }],
+      include: ['fp.map'],
+    }))).toThrow('requires the "fp" entrypoint to be enabled')
   })
 })

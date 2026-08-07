@@ -2,16 +2,27 @@ import { defineNuxtModule, createResolver, addImports, useLogger } from '@nuxt/k
 import * as toolkitPrefer from './runtime/es-toolkit'
 import * as toolkitCompatAll from './runtime/es-toolkit-compat-all'
 import * as toolkitBase from './runtime/es-toolkit-base'
+import * as toolkitFp from './runtime/es-toolkit-fp'
+import * as toolkitMap from './runtime/es-toolkit-map'
+import * as toolkitSet from './runtime/es-toolkit-set'
 import { toArray } from './utils/module'
 import { planImports, type CompatMode } from './utils/imports'
 
 type LiteralUnion<T extends string> = T | (string & Record<never, never>)
 type KnownBaseMethod = Extract<keyof typeof toolkitBase, string>
 type KnownCompatMethod = Extract<keyof typeof toolkitCompatAll, string>
+type KnownFpMethod = Extract<keyof typeof toolkitFp, string>
+type KnownMapMethod = Extract<keyof typeof toolkitMap, string>
+type KnownSetMethod = Extract<keyof typeof toolkitSet, string>
+type KnownQualifiedMethod
+  = | `fp.${KnownFpMethod}`
+    | `map.${KnownMapMethod}`
+    | `set.${KnownSetMethod}`
 
 export type BaseToolkitMethod = LiteralUnion<KnownBaseMethod>
 export type CompatToolkitMethod = LiteralUnion<KnownCompatMethod>
-export type ToolkitMethod = LiteralUnion<KnownBaseMethod | KnownCompatMethod>
+export type ToolkitMethod = LiteralUnion<KnownBaseMethod | KnownCompatMethod | KnownQualifiedMethod>
+export type ToolkitEntrypoint = 'fp' | 'map' | 'set'
 
 export interface ModuleOptions {
   /**
@@ -38,6 +49,13 @@ export interface ModuleOptions {
    * @example baseMethods: ['map', 'filter']
    */
   baseMethods: BaseToolkitMethod[]
+  /**
+   * Additional es-toolkit entrypoints to auto-import with qualified names
+   *
+   * @defaultValue []
+   * @example entrypoints: ['fp', 'map', 'set']
+   */
+  entrypoints?: ToolkitEntrypoint[]
   /**
    * Register only these es-toolkit methods
    *
@@ -144,6 +162,15 @@ export default defineNuxtModule<ModuleOptions>({
     const preferEntry = resolve('./runtime/es-toolkit')
     const compatEntry = resolve('./runtime/es-toolkit-compat-all')
     const baseEntry = resolve('./runtime/es-toolkit-base')
+    const fpEntry = resolve('./runtime/es-toolkit-fp')
+    const mapEntry = resolve('./runtime/es-toolkit-map')
+    const setEntry = resolve('./runtime/es-toolkit-set')
+    const entrypoints = new Set(toArray(_options.entrypoints || []))
+    for (const entrypoint of entrypoints) {
+      if (entrypoint !== 'fp' && entrypoint !== 'map' && entrypoint !== 'set') {
+        throw new Error(`[nuxt-es-toolkit] Unknown entrypoint "${entrypoint}". Expected "fp", "map", or "set".`)
+      }
+    }
     const prefixSkip = _options.prefixSkip === undefined
       ? ['is']
       : _options.prefixSkip === false
@@ -162,6 +189,11 @@ export default defineNuxtModule<ModuleOptions>({
         compat: compatEntry,
         base: baseEntry,
       },
+      entrypoints: [
+        { name: 'fp', enabled: entrypoints.has('fp'), exports: toolkitFp, entry: fpEntry },
+        { name: 'map', enabled: entrypoints.has('map'), exports: toolkitMap, entry: mapEntry },
+        { name: 'set', enabled: entrypoints.has('set'), exports: toolkitSet, entry: setEntry },
+      ],
       compatMethods: toArray(_options.compatMethods || []),
       baseMethods: toArray(_options.baseMethods || []),
       include: _options.include === undefined ? undefined : toArray(_options.include),

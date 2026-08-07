@@ -16,6 +16,13 @@ export interface ImportSurfaces {
   base: ToolkitModule
 }
 
+export interface EntrypointSurface {
+  name: string
+  enabled: boolean
+  exports: ToolkitModule
+  entry: string
+}
+
 export interface PlannedImport {
   name: string
   as: string
@@ -26,6 +33,7 @@ export interface PlanImportsOptions {
   compatMode: CompatMode
   surfaces: ImportSurfaces
   entries: ImportEntries
+  entrypoints?: readonly EntrypointSurface[]
   compatMethods: readonly string[]
   baseMethods: readonly string[]
   include?: readonly string[]
@@ -93,6 +101,9 @@ const isValidIdentifier = (value: string) =>
 
 const unique = (values: Iterable<string>) => [...new Set(values)]
 
+const upperFirst = (value: string) =>
+  `${value[0]?.toUpperCase() ?? ''}${value.slice(1)}`
+
 const configError = (message: string) => new Error(`[nuxt-es-toolkit] ${message}`)
 
 const validateMethods = (
@@ -136,31 +147,78 @@ export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
       : options.entries.prefer
   const defaultExports = new Set(Object.keys(defaultSurface))
 
-  let methods: string[]
-  if (options.include === undefined) {
-    methods = unique([...defaultExports, ...compatMethods, ...baseMethods])
+  interface ImportCandidate {
+    key: string
+    name: string
+    defaultAlias: string
+    from: string
   }
-  else {
-    methods = unique(options.include)
-    for (const method of methods) {
-      if (!availableExports.has(method)) {
-        throw configError(`Unknown include entry "${method}"; it is not exported by es-toolkit.`)
-      }
-      if (!defaultExports.has(method) && !compatMethods.has(method) && !baseMethods.has(method)) {
-        throw configError(`Included method "${method}" is not available in the selected compat mode; add a per-method override.`)
+
+  const candidates = new Map<string, ImportCandidate>()
+  for (const name of defaultExports) {
+    candidates.set(name, { key: name, name, defaultAlias: name, from: defaultEntry })
+  }
+  for (const name of compatMethods) {
+    candidates.set(name, { key: name, name, defaultAlias: name, from: options.entries.compat })
+  }
+  for (const name of baseMethods) {
+    candidates.set(name, { key: name, name, defaultAlias: name, from: options.entries.base })
+  }
+
+  const knownQualifiedMethods = new Map<string, string>()
+  const entrypointNames = new Set<string>()
+  for (const entrypoint of options.entrypoints ?? []) {
+    if (entrypointNames.has(entrypoint.name)) {
+      throw configError(`Entrypoint "${entrypoint.name}" is configured more than once.`)
+    }
+    entrypointNames.add(entrypoint.name)
+
+    for (const name of Object.keys(entrypoint.exports)) {
+      const key = `${entrypoint.name}.${name}`
+      knownQualifiedMethods.set(key, entrypoint.name)
+      if (entrypoint.enabled) {
+        candidates.set(key, {
+          key,
+          name,
+          defaultAlias: `${entrypoint.name}${upperFirst(name)}`,
+          from: entrypoint.entry,
+        })
       }
     }
   }
 
+  let selectedCandidates: ImportCandidate[]
+  if (options.include === undefined) {
+    selectedCandidates = [...candidates.values()]
+  }
+  else {
+    selectedCandidates = unique(options.include).map((method) => {
+      const candidate = candidates.get(method)
+      if (candidate) {
+        return candidate
+      }
+      const entrypoint = knownQualifiedMethods.get(method)
+      if (entrypoint) {
+        throw configError(`Included method "${method}" requires the "${entrypoint}" entrypoint to be enabled.`)
+      }
+      if (availableExports.has(method)) {
+        throw configError(`Included method "${method}" is not available in the selected compat mode; add a per-method override.`)
+      }
+      throw configError(`Unknown include entry "${method}"; it is not exported by es-toolkit.`)
+    })
+  }
+
+  const knownMethods = new Set([...availableExports, ...knownQualifiedMethods.keys()])
+
   for (const method of options.exclude) {
-    if (!availableExports.has(method)) {
+    if (!knownMethods.has(method)) {
       options.warn?.(`Unknown exclude entry "${method}"; it will be ignored.`)
     }
   }
 
   const aliasEntries = [...options.alias]
   for (const [method] of aliasEntries) {
-    if (!availableExports.has(method)) {
+    if (!knownMethods.has(method)) {
       options.warn?.(`Unknown alias source "${method}"; it will be ignored.`)
     }
   }
@@ -177,36 +235,28 @@ export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
   const generatedNames = new Map<string, string>()
   const imports: PlannedImport[] = []
 
-  for (const name of methods) {
-    if (excludes.has(name)) {
+  for (const candidate of selectedCandidates) {
+    if (excludes.has(candidate.key)) {
       continue
     }
 
-    const alias = aliasMap.get(name) ?? name
+    const alias = aliasMap.get(candidate.key) ?? candidate.defaultAlias
     const skipPrefix = options.prefixSkip.some(value => alias.startsWith(value))
     const as = !prefix || skipPrefix
       ? alias
-      : `${prefix}${alias[0]?.toUpperCase() ?? ''}${alias.slice(1)}`
+      : `${prefix}${upperFirst(alias)}`
 
     if (!isValidIdentifier(as)) {
-      throw configError(`Generated import name "${as}" for "${name}" is not a valid JavaScript identifier.`)
+      throw configError(`Generated import name "${as}" for "${candidate.key}" is not a valid JavaScript identifier.`)
     }
 
     const duplicate = generatedNames.get(as)
     if (duplicate) {
-      throw configError(`Methods "${duplicate}" and "${name}" both generate the import name "${as}".`)
+      throw configError(`Methods "${duplicate}" and "${candidate.key}" both generate the import name "${as}".`)
     }
-    generatedNames.set(as, name)
+    generatedNames.set(as, candidate.key)
 
-    let from = defaultEntry
-    if (compatMethods.has(name)) {
-      from = options.entries.compat
-    }
-    else if (baseMethods.has(name)) {
-      from = options.entries.base
-    }
-
-    imports.push({ name, as, from })
+    imports.push({ name: candidate.name, as, from: candidate.from })
   }
 
   return imports

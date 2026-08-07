@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "name": "entrypoints",
+  "type": "module"
+}
