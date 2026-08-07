@@ -20,12 +20,10 @@ const map = {
 const createOptions = (overrides: Partial<PlanImportsOptions> = {}): PlanImportsOptions => ({
   compatMode: 'prefer',
   surfaces: {
-    prefer: { ...base, add: compat.add },
     compat,
     base,
   },
   entries: {
-    prefer: '/prefer',
     compat: '/compat',
     base: '/base',
   },
@@ -42,14 +40,14 @@ const createOptions = (overrides: Partial<PlanImportsOptions> = {}): PlanImports
 describe('import planner', () => {
   it('limits registration to included methods', () => {
     expect(planImports(createOptions({ include: ['chunk'] }))).toEqual([
-      { name: 'chunk', as: 'useChunk', from: '/prefer' },
+      { name: 'chunk', as: 'useChunk', from: '/compat' },
     ])
     expect(planImports(createOptions({ include: [] }))).toEqual([])
   })
 
   it('allows include to opt into a broad default exclusion', () => {
     expect(planImports(createOptions({ include: ['head'] }))).toEqual([
-      { name: 'head', as: 'useHead', from: '/prefer' },
+      { name: 'head', as: 'useHead', from: '/base' },
     ])
   })
 
@@ -69,6 +67,18 @@ describe('import planner', () => {
     }))
 
     expect(imports).toContainEqual({ name: 'add', as: 'useAdd', from: '/compat' })
+  })
+
+  it('prefers compat for overlaps and falls back to base', () => {
+    const imports = planImports(createOptions({
+      include: ['chunk', 'add', 'isNotNil'],
+    }))
+
+    expect(imports).toEqual([
+      { name: 'chunk', as: 'useChunk', from: '/compat' },
+      { name: 'add', as: 'useAdd', from: '/compat' },
+      { name: 'isNotNil', as: 'isNotNil', from: '/base' },
+    ])
   })
 
   it('rejects conflicting and unknown source overrides', () => {

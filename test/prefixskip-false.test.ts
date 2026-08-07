@@ -16,7 +16,7 @@ describe('prefixSkip option', async () => {
     // Regression for https://github.com/bubblesortt/nuxt-es-toolkit/issues/3
     const imports = readImports()
 
-    expect(imports).toContain('useIsNotNil')
-    expect(imports).toContain('useIsString')
+    expect(imports).toContain('etIsNotNil')
+    expect(imports).toContain('etIsString')
   })
 })

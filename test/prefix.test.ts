@@ -15,13 +15,13 @@ describe('prefix option', async () => {
   it('disables the prefix and keeps original casing when prefix is blank', () => {
     const imports = readImports()
 
-    // A regular (non-predicate) function is registered without the `use` prefix ...
-    expect(imports).not.toContain('useUpperFirst')
+    // A regular (non-predicate) function is registered without the `et` prefix ...
+    expect(imports).not.toContain('etUpperFirst')
     // ... and without a leading-space identifier (the bug a blank prefix used to cause)
     expect(imports).not.toMatch(/\sUpperFirst/)
     // ... but with its bare, original-casing name
     expect(imports).toMatch(/\bupperFirst\b/)
-    // prefixSkip still keeps predicate names bare
+    // A blank prefix also keeps predicate names bare.
     expect(imports).toMatch(/\bisNotNil\b/)
   })
 })

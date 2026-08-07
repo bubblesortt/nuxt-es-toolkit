@@ -11,10 +11,10 @@ describe('optional entrypoints', async () => {
   it('registers collision-resistant qualified imports', () => {
     const imports = readImports()
 
-    expect(findImportLine(imports, 'useFpMap')).toContain('runtime/es-toolkit-fp')
-    expect(findImportLine(imports, 'useMapFilter')).toContain('runtime/es-toolkit-map')
-    expect(findImportLine(imports, 'useSetMap')).toContain('runtime/es-toolkit-set')
-    expect(findImportLine(imports, 'useMap')).toBeUndefined()
+    expect(findImportLine(imports, 'etFpMap')).toContain('runtime/es-toolkit-fp')
+    expect(findImportLine(imports, 'etMapFilter')).toContain('runtime/es-toolkit-map')
+    expect(findImportLine(imports, 'etSetMap')).toContain('runtime/es-toolkit-set')
+    expect(findImportLine(imports, 'etMap')).toBeUndefined()
   })
 
   it('executes each entrypoint during SSR', async () => {

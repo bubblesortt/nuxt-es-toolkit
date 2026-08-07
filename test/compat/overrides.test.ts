@@ -14,8 +14,8 @@ describe('compat overrides in prefer mode', async () => {
 
   it('imports forced methods from specified entries', () => {
     const imports = readImports()
-    const chunkLine = findImportLine(imports, 'useChunk')
-    const compactLine = findImportLine(imports, 'useCompact')
+    const chunkLine = findImportLine(imports, 'etChunk')
+    const compactLine = findImportLine(imports, 'etCompact')
 
     expect(chunkLine).toContain('runtime/es-toolkit-compat-all')
     expect(compactLine).toContain('runtime/es-toolkit-base')

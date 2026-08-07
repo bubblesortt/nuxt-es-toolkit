@@ -1,5 +1,4 @@
 import { defineNuxtModule, createResolver, addImports, useLogger } from '@nuxt/kit'
-import * as toolkitPrefer from './runtime/es-toolkit'
 import * as toolkitCompatAll from './runtime/es-toolkit-compat-all'
 import * as toolkitBase from './runtime/es-toolkit-base'
 import * as toolkitFp from './runtime/es-toolkit-fp'
@@ -32,7 +31,7 @@ export interface ModuleOptions {
    * - 'only' or true: use compat exports only (Lodash-compatible)
    * - false: use base es-toolkit exports only
    *
-   * @defaultValue 'prefer'
+   * @defaultValue false
    */
   compat: 'prefer' | 'only' | boolean
   /**
@@ -85,8 +84,8 @@ export interface ModuleOptions {
    * An empty string (or any blank/whitespace value) disables the prefix
    * and keeps each function's original casing.
    *
-   * @defaultValue `use`
-   * @example prefix: 'use'
+   * @defaultValue `et`
+   * @example prefix: 'et'
    */
   prefix: string
   /**
@@ -95,7 +94,7 @@ export interface ModuleOptions {
    * Pass `false` or an empty array to disable prefix-skipping entirely, so every
    * function (including `is*`) receives the prefix.
    *
-   * @defaultValue ['is']
+   * @defaultValue false
    * @example prefixSkip: ['is', 'has']
    */
   prefixSkip?: string[] | false
@@ -110,20 +109,20 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   defaults: {
-    compat: 'prefer',
+    compat: false,
     compatMethods: [],
     baseMethods: [],
     exclude: [],
     alias: [],
-    prefix: 'use',
+    prefix: 'et',
     // `prefixSkip` is intentionally absent from `defaults`: Nuxt merges module
     // options with `defu`, which drops empty arrays and concatenates arrays with
     // the default. Declaring it here would break `prefixSkip: []` and surprise
-    // users who pass their own list. The `['is']` default is applied in `setup`.
+    // users who pass their own list. The empty default is applied in `setup`.
   },
   setup(_options, _nuxt) {
     const { resolve } = createResolver(import.meta.url)
-    let compatMode: CompatMode = 'prefer'
+    let compatMode: CompatMode = false
     if (_options.compat === true) {
       compatMode = 'only'
     }
@@ -159,7 +158,6 @@ export default defineNuxtModule<ModuleOptions>({
       'AbortError',
       'TimeoutError',
     ]
-    const preferEntry = resolve('./runtime/es-toolkit')
     const compatEntry = resolve('./runtime/es-toolkit-compat-all')
     const baseEntry = resolve('./runtime/es-toolkit-base')
     const fpEntry = resolve('./runtime/es-toolkit-fp')
@@ -172,7 +170,7 @@ export default defineNuxtModule<ModuleOptions>({
       }
     }
     const prefixSkip = _options.prefixSkip === undefined
-      ? ['is']
+      ? []
       : _options.prefixSkip === false
         ? []
         : toArray(_options.prefixSkip)
@@ -180,12 +178,10 @@ export default defineNuxtModule<ModuleOptions>({
     const imports = planImports({
       compatMode,
       surfaces: {
-        prefer: toolkitPrefer,
         compat: toolkitCompatAll,
         base: toolkitBase,
       },
       entries: {
-        prefer: preferEntry,
         compat: compatEntry,
         base: baseEntry,
       },

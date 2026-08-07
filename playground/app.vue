@@ -5,5 +5,5 @@
 </template>
 
 <script setup lang="ts">
-const upper = useUpperFirst('hello')
+const upper = etUpperFirst('hello')
 </script>

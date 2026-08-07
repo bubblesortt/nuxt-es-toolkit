@@ -4,4 +4,7 @@ export default defineNuxtConfig({
   modules: [
     MyModule,
   ],
+  esToolkit: {
+    compat: 'prefer',
+  },
 })

@@ -18,7 +18,7 @@ describe('prefixSkip option', async () => {
     // so predicate names stayed bare.
     const imports = readImports()
 
-    expect(imports).toContain('useIsNotNil')
-    expect(imports).toContain('useIsString')
+    expect(imports).toContain('etIsNotNil')
+    expect(imports).toContain('etIsString')
   })
 })

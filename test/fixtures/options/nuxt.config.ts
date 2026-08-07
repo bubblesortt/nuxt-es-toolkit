@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     MyModule,
   ],
   esToolkit: {
+    compat: 'prefer',
     prefix: 'use',
     prefixSkip: ['is'],
     exclude: ['sum', 'map'],

@@ -13,6 +13,6 @@ describe('prefixSkip list replaces (not concatenates with is)', async () => {
     // has/hasIn start with 'has' -> should be bare
     expect(imports).toMatch(/(^|[^a-zA-Z])hasIn([,} ]|$)/m)
     // is* no longer skipped -> should be prefixed now
-    expect(imports).toContain('useIsNotNil')
+    expect(imports).toContain('etIsNotNil')
   })
 })

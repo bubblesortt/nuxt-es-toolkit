@@ -14,7 +14,7 @@ describe('cross-surface override', async () => {
 
   it('registers a base-only method in compat-only mode', () => {
     const imports = readImports()
-    const line = findImportLine(imports, 'isNotNil')
+    const line = findImportLine(imports, 'etIsNotNil')
 
     expect(line).toContain('runtime/es-toolkit-base')
   })

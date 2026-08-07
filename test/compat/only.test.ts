@@ -14,10 +14,10 @@ describe('compat only mode', async () => {
 
   it('skips base-only exports by default and allows base overrides', () => {
     const imports = readImports()
-    const compactLine = findImportLine(imports, 'useCompact')
+    const compactLine = findImportLine(imports, 'etCompact')
 
-    expect(imports).toContain('useAdd')
-    expect(imports).not.toMatch(/\bisNotNil\b/)
+    expect(imports).toContain('etAdd')
+    expect(imports).not.toMatch(/\betIsNotNil\b/)
     expect(compactLine).toContain('runtime/es-toolkit-base')
   })
 })

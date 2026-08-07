@@ -1,5 +1,27 @@
 # Changelog
 
+## v2.0.0
+
+[compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.2.0...v2.0.0)
+
+### Breaking Changes
+
+- Use base `es-toolkit` exports by default (`compat: false`)
+- Prefix every generated import with `et` by default, including predicates such as `etIsEqual`
+- Disable prefix skipping by default; configure `prefixSkip` explicitly when needed
+- Correct `compat: 'prefer'` so every overlapping export resolves to `es-toolkit/compat`
+
+### Improvements
+
+- Replace the hand-maintained preferred-compat barrel with deterministic base/compat resolution
+- Remove obsolete runtime helpers and keep generated import sources transparent
+- Update fixtures and examples for the safer defaults
+
+### Migration
+
+- Add a v1-to-v2 migration guide with configuration that preserves legacy names and compat behavior
+- Document source-selection changes for overlapping base and compat utilities
+
 ## v1.2.0
 
 [compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.1.0...v1.2.0)

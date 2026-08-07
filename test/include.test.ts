@@ -15,8 +15,8 @@ describe('include allowlist', async () => {
   it('registers only explicitly included utilities', () => {
     const imports = readImports()
 
-    expect(findImportLine(imports, 'useChunk')).toBeDefined()
-    expect(findImportLine(imports, 'isNotNil')).toBeDefined()
-    expect(findImportLine(imports, 'useMax')).toBeUndefined()
+    expect(findImportLine(imports, 'etChunk')).toBeDefined()
+    expect(findImportLine(imports, 'etIsNotNil')).toBeDefined()
+    expect(findImportLine(imports, 'etMax')).toBeUndefined()
   })
 })
