@@ -7,12 +7,14 @@
 ![Nuxt 3.x | 4.x][nuxt-href]
 
 ## 🪄 About
-A lightweight Nuxt 3 & 4 module that auto-imports functions from [es-toolkit](https://es-toolkit.dev) as Nuxt composables
+
+A lightweight Nuxt 3 & 4 module that auto-imports utilities from [es-toolkit](https://es-toolkit.dev)
 with full TypeScript support.
 
 ---
 
 ## ✨ Features
+
 - Auto-import `es-toolkit` functions
 - Support custom prefix or no prefix at all
 - Skip prefix automatically for predicate-like names (`isX`) via `prefixSkip`
@@ -20,7 +22,7 @@ with full TypeScript support.
 - Exclude unwanted functions
 - Generated `.d.ts` for IDE autocomplete
 - Tree-shaking friendly (import only what you use)
-- Zero runtime overhead (handled at build phase)
+- No runtime wrapper (imports are generated during Nuxt setup)
 - Nuxt 3 & 4 compatible
 - Clean and minimal configuration surface
 
@@ -28,9 +30,10 @@ with full TypeScript support.
 
 ## 📦 Install
 
-Using nuxt cli
+Using the Nuxt CLI:
+
 ```bash
-npx nuxt module add @bubblesortt/nuxt-es-toolkit
+npx nuxt module add --dev @bubblesortt/nuxt-es-toolkit
 ```
 
 or manual
@@ -56,40 +59,45 @@ bun add -d @bubblesortt/nuxt-es-toolkit
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["@bubblesortt/nuxt-es-toolkit"],
-});
+  modules: ['@bubblesortt/nuxt-es-toolkit'],
+})
 ```
+
 3. Config it if you need:
+
 ```ts
 export default defineNuxtConfig({
-  modules: ["@bubblesortt/nuxt-es-toolkit"],
+  modules: ['@bubblesortt/nuxt-es-toolkit'],
   esToolkit: {
     // your options here
-  }
-});
-``` 
-or
+  },
+})
+```
+
+Or pass options inline:
+
 ```ts
 export default defineNuxtConfig({
   modules: [
-    ["@bubblesortt/nuxt-es-toolkit",
+    [
+      '@bubblesortt/nuxt-es-toolkit',
       {
         // your options here
       },
     ],
   ],
-});
+})
 ```
 
 ---
 
 ## 🧪 Example
 
-When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt application, they will be auto-imported
+When you use [es-toolkit](https://es-toolkit.dev) utilities in your Nuxt application, they are auto-imported:
 
 ```vue
 <script setup lang="ts">
-  const text = useUpperFirst("hello");
+const text = useUpperFirst('hello')
 </script>
 
 <template>
@@ -117,28 +125,28 @@ When you use  [Es-toolkit](https://es-toolkit.dev) utilities in your Nuxt applic
 
 ```ts
 export default defineNuxtConfig({
-  modules: ["@bubblesortt/nuxt-es-toolkit"],
+  modules: ['@bubblesortt/nuxt-es-toolkit'],
   esToolkit: {
-    compat: "only",
-    compatMethods: ["get"],
-    baseMethods: ["map"],
-    prefix: "use",
-    prefixSkip: ["is"],
-    exclude: ["map", "find"],
+    compat: 'only',
+    compatMethods: ['get'],
+    baseMethods: ['map'],
+    prefix: 'use',
+    prefixSkip: ['is'],
+    exclude: ['map', 'find'],
     alias: [
-      ["sum", "total"], // => useTotal
-      ["max", "maximum"], // => useMaximum
-      ["isDate", "isExactlyDate"], // => isExactlyDate
+      ['sum', 'total'], // => useTotal
+      ['max', 'maximum'], // => useMaximum
+      ['isDate', 'isExactlyDate'], // => isExactlyDate
     ],
   },
-});
+})
 ```
 
 ---
 
 ## 🧠 TypeScript & DX
 
-- Auto-generated `.d.ts` lets your IDE know about added composables instantly (after first `nuxt dev` run).
+- Auto-generated `.d.ts` lets your IDE know about added utilities after the first `nuxt dev` run.
 - Works with both server & client usage transparently.
 - Safe to use in strict TS setups.
 
@@ -146,9 +154,13 @@ export default defineNuxtConfig({
 
 ## 🚀 Performance
 
-- Zero additional runtime code: everything is resolved at compile time.
+- No module-specific runtime wrapper: Nuxt resolves direct `es-toolkit` imports during setup.
 - Tree-shaking remains effective (only referenced functions are bundled) as long as `es-toolkit` provides proper ESM exports without side effects.
 - No dynamic imports or proxies.
+
+## ✅ Compatibility
+
+CI verifies the module against Nuxt 3.21 on Node 20 and Nuxt 4.5 on Node 24. The package supports Node `^20.19.0 || >=22.12.0`; each Nuxt major may impose a narrower Node range.
 
 ---
 
@@ -166,26 +178,20 @@ export default defineNuxtConfig({
   
   ```bash
   # Install dependencies
-  npm install
+  corepack enable
+  pnpm install --frozen-lockfile
   
   # Generate type stubs
-  npm run dev:prepare
+  pnpm dev:prepare
   
   # Develop with the playground
-  npm run dev
+  pnpm dev
   
   # Build the playground
-  npm run dev:build
+  pnpm dev:build
   
-  # Run ESLint
-  npm run lint
-  
-  # Run Vitest
-  npm run test
-  npm run test:watch
-  
-  # Release new version
-  npm run release
+  # Run all quality checks
+  pnpm check
   ```
 
 </details>

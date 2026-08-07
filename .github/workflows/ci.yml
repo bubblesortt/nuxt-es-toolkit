@@ -8,42 +8,80 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
+  quality:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: 20
-
-      - run: npm i -g --force corepack@latest && corepack enable
+          node-version: 24.14.0
+          cache: pnpm
 
       - name: Install dependencies
-        run: npx nypm@latest i
+        run: pnpm install --frozen-lockfile
+
+      - name: Prepare playground
+        run: pnpm dev:prepare
 
       - name: Lint
-        run: npm run lint
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - run: npm i -g --force corepack@latest && corepack enable
-
-      - name: Install dependencies
-        run: npx nypm@latest i
-
-      - name: Playground prepare
-        run: npm run dev:prepare
+        run: pnpm lint
 
       - name: Test
-        run: npm run test
+        run: pnpm test
+
+      - name: Type check
+        run: pnpm test:types
+
+      - name: Build playground
+        run: pnpm dev:build
+
+      - name: Build package
+        run: pnpm prepack
+
+      - name: Validate package
+        run: pnpm test:package
+
+  compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nuxt: 3.21.11
+            node: 20.19.5
+          - nuxt: 4.5.2
+            node: 24.14.0
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Select Nuxt ${{ matrix.nuxt }}
+        run: pnpm add --save-dev --lockfile=false nuxt@${{ matrix.nuxt }}
+
+      - name: Prepare playground
+        run: pnpm dev:prepare
+
+      - name: Test
+        run: pnpm test
