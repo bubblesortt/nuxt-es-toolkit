@@ -1,6 +1,6 @@
 # Migrating from v1 to v2
 
-Version 2 uses safer, explicit defaults. Package publication and the version bump are separate maintainer steps; this guide describes the prepared major branch.
+Version 2 uses safer, explicit defaults. Review these changes before upgrading and use the compatibility configuration below when migrating incrementally.
 
 ## Default Behavior
 

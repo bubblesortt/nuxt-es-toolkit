@@ -1,8 +1,8 @@
 # Nuxt ES Toolkit Development Plan
 
-## Goal and Constraints
+## Goal and Initial Constraints
 
-Prepare a locally verified release train that modernizes dependencies, makes auto-import generation predictable, expands opt-in functionality, and provides a clean migration path for safer defaults. Work stays local: do not bump the package version, create tags, publish to npm, push branches, or run the `release` script.
+Prepare a locally verified release train that modernizes dependencies, makes auto-import generation predictable, expands opt-in functionality, and provides a clean migration path for safer defaults. The implementation phase stayed local until the maintainer explicitly approved the release workflow.
 
 ## Execution Status — 2026-08-07
 
@@ -12,7 +12,7 @@ Prepare a locally verified release train that modernizes dependencies, makes aut
 - [x] v2.0.0 compat semantics, safer defaults, and migration guide
 - [x] Full quality gate, production audit, package inspection, and packed Nuxt 3/4 consumer builds
 
-TypeScript 7 remains deferred until `@nuxt/module-builder` declares support. `es-toolkit/server` remains deferred until a dedicated Nuxt server-only API is designed and tested. No version bump, release commit, tag, publication, push, or other remote operation was performed.
+TypeScript 7 remains deferred until `@nuxt/module-builder` declares support. `es-toolkit/server` remains deferred until a dedicated Nuxt server-only API is designed and tested. After explicit maintainer approval, each prepared version is merged, tagged, and published only after its branch and `main` CI pass.
 
 Each release branch is stacked on the previous one so it can later be merged and released in order:
 
@@ -84,4 +84,4 @@ Acceptance: all three compat modes select the documented source for every overla
 - Pack the module and inspect the tarball file list, size, exports, and type declarations from a clean consumer fixture.
 - Smoke-test the packed module against the latest supported Nuxt 3 and Nuxt 4 releases on supported Node versions.
 - Review `git diff`, branch ancestry, and commit history; leave only intentional tracked changes.
-- Record completed/deferred items and exact verification commands in the final handoff. Publishing, release commits, tags, and remote operations remain the maintainer's follow-up.
+- Record completed/deferred items and exact verification commands in the final handoff.
