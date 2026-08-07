@@ -1,5 +1,25 @@
 # Changelog
 
+## v1.2.0
+
+[compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.1.0...v1.2.0)
+
+### Features
+
+- Add opt-in auto-import surfaces for `es-toolkit/fp`, `es-toolkit/map`, and `es-toolkit/set`
+- Generate collision-resistant names such as `useFpMap`, `useMapFilter`, and `useSetMap`
+- Support qualified entrypoint methods in `include`, `exclude`, and aliases
+
+### Validation
+
+- Reject unknown entrypoints and report when an included method requires a disabled entrypoint
+- Keep runtime-free `es-toolkit/types` and Node-only `es-toolkit/server` helpers out of client auto-imports
+
+### Tests and Documentation
+
+- Exercise all optional entrypoints through SSR fixtures and focused planner tests
+- Document FP data-last signatures and Map/Set-specific behavior
+
 ## v1.1.0
 
 [compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.0.12...v1.1.0)
