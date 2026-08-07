@@ -1,10 +1,17 @@
-import { defineNuxtModule, createResolver, addImports } from '@nuxt/kit'
+import { defineNuxtModule, createResolver, addImports, useLogger } from '@nuxt/kit'
 import * as toolkitPrefer from './runtime/es-toolkit'
 import * as toolkitCompatAll from './runtime/es-toolkit-compat-all'
 import * as toolkitBase from './runtime/es-toolkit-base'
-import { toArray, upperFirst } from './utils/module'
+import { toArray } from './utils/module'
+import { planImports, type CompatMode } from './utils/imports'
 
-type ToolkitModule = Record<string, unknown>
+type LiteralUnion<T extends string> = T | (string & Record<never, never>)
+type KnownBaseMethod = Extract<keyof typeof toolkitBase, string>
+type KnownCompatMethod = Extract<keyof typeof toolkitCompatAll, string>
+
+export type BaseToolkitMethod = LiteralUnion<KnownBaseMethod>
+export type CompatToolkitMethod = LiteralUnion<KnownCompatMethod>
+export type ToolkitMethod = LiteralUnion<KnownBaseMethod | KnownCompatMethod>
 
 export interface ModuleOptions {
   /**
@@ -23,28 +30,37 @@ export interface ModuleOptions {
    * @defaultValue []
    * @example compatMethods: ['get', 'set']
    */
-  compatMethods: string[]
+  compatMethods: CompatToolkitMethod[]
   /**
    * Methods that should always be imported from es-toolkit base exports
    *
    * @defaultValue []
    * @example baseMethods: ['map', 'filter']
    */
-  baseMethods: string[]
+  baseMethods: BaseToolkitMethod[]
+  /**
+   * Register only these es-toolkit methods
+   *
+   * An empty array disables all broad auto-imports. Per-method source overrides
+   * still need to be listed here when an allowlist is present.
+   *
+   * @example include: ['chunk', 'isNotNil']
+   */
+  include?: ToolkitMethod[]
   /**
    * Array of es-toolkit functions to be excluded from auto imports
    *
    * @defaultValue []
    * @example exclude: ['sum', 'max']
    */
-  exclude: string[]
+  exclude: ToolkitMethod[]
   /**
    * Iterable of string pairs to alias each function
    *
    * @defaultValue []
    * @example alias: [['sum', 'total'], ['max', 'maximum']]
    */
-  alias: Iterable<[string, string]>
+  alias: Iterable<readonly [ToolkitMethod, string]>
   /**
    * Prefix to be added before every es-toolkit function
    *
@@ -89,7 +105,7 @@ export default defineNuxtModule<ModuleOptions>({
   },
   setup(_options, _nuxt) {
     const { resolve } = createResolver(import.meta.url)
-    let compatMode: 'prefer' | 'only' | false = 'prefer'
+    let compatMode: CompatMode = 'prefer'
     if (_options.compat === true) {
       compatMode = 'only'
     }
@@ -97,13 +113,6 @@ export default defineNuxtModule<ModuleOptions>({
       compatMode = _options.compat
     }
 
-    let toolkit = toolkitPrefer as ToolkitModule
-    if (compatMode === 'only') {
-      toolkit = toolkitCompatAll as ToolkitModule
-    }
-    else if (compatMode === false) {
-      toolkit = toolkitBase as ToolkitModule
-    }
     const excludeDefault = [
       'wrapperValue',
       'wrapperToIterator',
@@ -129,47 +138,41 @@ export default defineNuxtModule<ModuleOptions>({
       'head',
       'Mutex',
       'Semaphore',
+      'AbortError',
+      'TimeoutError',
     ]
     const preferEntry = resolve('./runtime/es-toolkit')
     const compatEntry = resolve('./runtime/es-toolkit-compat-all')
     const baseEntry = resolve('./runtime/es-toolkit-base')
-    let defaultEntry = preferEntry
-    if (compatMode === 'only') {
-      defaultEntry = compatEntry
-    }
-    else if (compatMode === false) {
-      defaultEntry = baseEntry
-    }
-    const compatOnly = new Set(toArray(_options.compatMethods || []))
-    const baseOnly = new Set(toArray(_options.baseMethods || []))
-    const compatExports = new Set(Object.keys(toolkitCompatAll as ToolkitModule))
-    const baseExports = new Set(Object.keys(toolkitBase as ToolkitModule))
-
     const prefixSkip = _options.prefixSkip === undefined
       ? ['is']
       : _options.prefixSkip === false
         ? []
         : toArray(_options.prefixSkip)
-    const aliasMap = new Map<string, string>(_options.alias)
-    const excludes = [..._options.exclude, ...excludeDefault]
-    for (const name of Object.keys(toolkit)) {
-      if (!excludes.includes(name)) {
-        const alias = aliasMap.has(name) ? String(aliasMap.get(name)) : name
-        const isSkipPrefix = prefixSkip.some(prefix => alias.startsWith(prefix))
-        // A blank/whitespace prefix disables the prefix (and uppercasing),
-        // keeping each function's original name. Trimming also guards against
-        // accidental surrounding whitespace, which would produce invalid identifiers.
-        const prefix = isSkipPrefix ? '' : (_options.prefix || '').trim()
-        const as = prefix ? `${prefix}${upperFirst(alias)}` : alias
-        let from = defaultEntry
-        if (compatOnly.has(name) && compatExports.has(name)) {
-          from = compatEntry
-        }
-        else if (baseOnly.has(name) && baseExports.has(name)) {
-          from = baseEntry
-        }
-        addImports({ name, as, from })
-      }
-    }
+    const logger = useLogger('nuxt-es-toolkit')
+    const imports = planImports({
+      compatMode,
+      surfaces: {
+        prefer: toolkitPrefer,
+        compat: toolkitCompatAll,
+        base: toolkitBase,
+      },
+      entries: {
+        prefer: preferEntry,
+        compat: compatEntry,
+        base: baseEntry,
+      },
+      compatMethods: toArray(_options.compatMethods || []),
+      baseMethods: toArray(_options.baseMethods || []),
+      include: _options.include === undefined ? undefined : toArray(_options.include),
+      exclude: toArray(_options.exclude || []),
+      defaultExclude: excludeDefault,
+      alias: _options.alias,
+      prefix: _options.prefix || '',
+      prefixSkip,
+      warn: message => logger.warn(message),
+    })
+
+    addImports(imports)
   },
 })

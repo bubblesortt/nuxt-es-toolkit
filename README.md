@@ -19,6 +19,7 @@ with full TypeScript support.
 - Support custom prefix or no prefix at all
 - Skip prefix automatically for predicate-like names (`isX`) via `prefixSkip`
 - Alias any function with type-safe completions
+- Limit registration to an explicit `include` allowlist
 - Exclude unwanted functions
 - Generated `.d.ts` for IDE autocomplete
 - Tree-shaking friendly (import only what you use)
@@ -114,6 +115,7 @@ const text = useUpperFirst('hello')
 | `compat`           | `'prefer'` | `'prefer'` = compat when available, `'only'`/`true` = compat only, `false` = base only |
 | `compatMethods`    | `[]`       | Methods to force import from `es-toolkit/compat`                                      |
 | `baseMethods`      | `[]`       | Methods to force import from base `es-toolkit`                                        |
+| `include`          | `undefined` | Optional allowlist of methods to register (`[]` registers none)                       |
 | `prefix`           | `'use'`    | String to prepend before each es-toolkit function (empty string to disable)           |
 | `exclude`          | `[]`       | Array of es-toolkit functions to exclude from auto imports                            |
 | `alias`            | `[]`       | Array of array pairs to rename specific es-toolkit functions (prefix is still added)  |
@@ -141,6 +143,19 @@ export default defineNuxtConfig({
   },
 })
 ```
+
+For a smaller global surface, use an allowlist:
+
+```ts
+export default defineNuxtConfig({
+  modules: ['@bubblesortt/nuxt-es-toolkit'],
+  esToolkit: {
+    include: ['chunk', 'isNotNil', 'sum'],
+  },
+})
+```
+
+When `include` is present, per-method overrides must also appear in the allowlist. Explicitly included methods may opt into exports normally omitted from broad registration. Invalid included methods, conflicting source overrides, invalid aliases, and duplicate generated names stop setup with an actionable error; unknown `exclude` and alias sources produce warnings.
 
 ---
 
