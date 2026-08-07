@@ -1,5 +1,26 @@
 # Changelog
 
+## v1.1.0
+
+[compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.0.12...v1.1.0)
+
+### Features
+
+- Add a typed `include` allowlist for registering only selected utilities
+- Plan and register imports deterministically in a single batch
+- Allow explicit base and compat selections across the active default surface
+
+### Fixes
+
+- Reject conflicting overrides, duplicate generated names, invalid identifiers, and unknown explicit selections
+- Warn about unknown exclusions and aliases while preserving forward-compatible method names
+- Exclude class-like error exports from broad default imports
+
+### Tests and Documentation
+
+- Cover allowlists, aliases, validation, and cross-surface overrides with unit and Nuxt fixture tests
+- Document import controls, diagnostics, and public option types
+
 ## v1.0.12
 
 [compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.0.11...v1.0.12)
