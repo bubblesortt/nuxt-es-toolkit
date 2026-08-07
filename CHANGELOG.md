@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.0.12
+
+[compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.0.11...v1.0.12)
+
+### Fixes
+
+- Update `es-toolkit` to 1.50.0 and refresh Nuxt runtime dependencies
+- Resolve production dependency advisories and add package metadata
+
+### Tests
+
+- Match generated auto-import identifiers exactly
+- Validate the package artifact with publint
+
+### CI
+
+- Add Nuxt 3 and Nuxt 4 compatibility coverage
+- Run lint, tests, type checks, playground build, and package validation with frozen installs
+
+### Documentation
+
+- Add repository guidelines, an MIT license, and the local development roadmap
+- Clarify installation, runtime requirements, and auto-import terminology
 
 ## v1.0.11
 
@@ -42,4 +65,3 @@
 [compare changes](https://github.com/BubbleSortt/nuxt-estoolkit/compare/v1.0.1...v1.0.2)
 
 ## v1.0.1
-
