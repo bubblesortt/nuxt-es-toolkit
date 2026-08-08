@@ -1,18 +1,20 @@
 import { defineNuxtModule, createResolver, addImports, useLogger } from '@nuxt/kit'
-import * as toolkitCompatAll from './runtime/es-toolkit-compat-all'
-import * as toolkitBase from './runtime/es-toolkit-base'
-import * as toolkitFp from './runtime/es-toolkit-fp'
-import * as toolkitMap from './runtime/es-toolkit-map'
-import * as toolkitSet from './runtime/es-toolkit-set'
+import {
+  baseExports,
+  compatExports,
+  fpExports,
+  mapExports,
+  setExports,
+} from './generated/es-toolkit-exports'
 import { toArray } from './utils/module'
 import { planImports, type CompatMode } from './utils/imports'
 
 type LiteralUnion<T extends string> = T | (string & Record<never, never>)
-type KnownBaseMethod = Extract<keyof typeof toolkitBase, string>
-type KnownCompatMethod = Extract<keyof typeof toolkitCompatAll, string>
-type KnownFpMethod = Extract<keyof typeof toolkitFp, string>
-type KnownMapMethod = Extract<keyof typeof toolkitMap, string>
-type KnownSetMethod = Extract<keyof typeof toolkitSet, string>
+type KnownBaseMethod = typeof baseExports[number]
+type KnownCompatMethod = typeof compatExports[number]
+type KnownFpMethod = typeof fpExports[number]
+type KnownMapMethod = typeof mapExports[number]
+type KnownSetMethod = typeof setExports[number]
 type KnownQualifiedMethod
   = | `fp.${KnownFpMethod}`
     | `map.${KnownMapMethod}`
@@ -178,17 +180,17 @@ export default defineNuxtModule<ModuleOptions>({
     const imports = planImports({
       compatMode,
       surfaces: {
-        compat: Object.keys(toolkitCompatAll),
-        base: Object.keys(toolkitBase),
+        compat: compatExports,
+        base: baseExports,
       },
       entries: {
         compat: compatEntry,
         base: baseEntry,
       },
       entrypoints: [
-        { name: 'fp', enabled: entrypoints.has('fp'), exports: Object.keys(toolkitFp), entry: fpEntry },
-        { name: 'map', enabled: entrypoints.has('map'), exports: Object.keys(toolkitMap), entry: mapEntry },
-        { name: 'set', enabled: entrypoints.has('set'), exports: Object.keys(toolkitSet), entry: setEntry },
+        { name: 'fp', enabled: entrypoints.has('fp'), exports: fpExports, entry: fpEntry },
+        { name: 'map', enabled: entrypoints.has('map'), exports: mapExports, entry: mapEntry },
+        { name: 'set', enabled: entrypoints.has('set'), exports: setExports, entry: setEntry },
       ],
       compatMethods: toArray(_options.compatMethods || []),
       baseMethods: toArray(_options.baseMethods || []),

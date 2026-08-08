@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { describe, it, expect } from 'vitest'
 import { setup, $fetch } from '@nuxt/test-utils/e2e'
-import { findImportLine, readImports } from './utils/imports'
+import { findImportLine, normalizeGeneratedToolkitImports, readImports } from './utils/imports'
 
 describe('ssr', async () => {
   await setup({
@@ -29,5 +29,6 @@ describe('ssr', async () => {
     expect(findImportLine(imports, 'etIsNotNil')).toContain('runtime/es-toolkit-base')
     expect(findImportLine(imports, 'etAdd')).toBeUndefined()
     expect(findImportLine(imports, 'useChunk')).toBeUndefined()
+    expect(normalizeGeneratedToolkitImports(imports)).toHaveLength(185)
   })
 })

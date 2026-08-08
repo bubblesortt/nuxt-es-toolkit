@@ -24,3 +24,16 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 
 export const findImportLine = (imports: string, identifier: string) =>
   imports.split('\n').find(line => new RegExp(`(?<![$\\w])${escapeRegExp(identifier)}(?![$\\w])`).test(line))
+
+export const normalizeGeneratedToolkitImports = (imports: string) => {
+  // The required source capture is bounded by a subsequent quoted suffix.
+  // eslint-disable-next-line regexp/no-super-linear-backtracking, regexp/optimal-quantifier-concatenation
+  const matches = imports.matchAll(/export \{([^}]+)\} from ['"][^'"]*\/runtime\/(es-toolkit-[^.'"]+)[^'"]*['"]/g)
+  return [...matches].flatMap((match) => {
+    const source = match[2]!
+    return match[1]!.split(',').map((specifier) => {
+      const [name, as = name] = specifier.trim().split(/\s+as\s+/) as [string, string?]
+      return { name, as, source }
+    })
+  }).sort((left, right) => left.as.localeCompare(right.as))
+}
