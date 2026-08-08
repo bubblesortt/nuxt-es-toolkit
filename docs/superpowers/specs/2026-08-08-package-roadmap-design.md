@@ -75,7 +75,7 @@ Correctness, import-manifest, and bundle-size regressions are blocking. Overall 
 
 ### Generated Export Catalogue
 
-Add a committed file such as `src/generated/es-toolkit-exports.ts`. It contains the source `es-toolkit` version and sorted `as const` arrays for the base, compat, FP, Map, and Set export surfaces. It contains names only and never imports utility implementations.
+Add the committed file `src/generated/es-toolkit-exports.ts`. It contains the source `es-toolkit` version and sorted `as const` arrays for the base, compat, FP, Map, and Set export surfaces. It contains names only and never imports utility implementations.
 
 Public method union types are derived from these arrays instead of `keyof` namespace imports. This preserves autocomplete while removing runtime surface evaluation from `src/module.ts`.
 
@@ -154,7 +154,7 @@ Write the report through the Nuxt build/template lifecycle at:
 .nuxt/es-toolkit/imports.json
 ```
 
-The real location follows `nuxt.options.buildDir`. The report includes `schemaVersion: 1`, module and `es-toolkit` versions, summary counters, final imports, and candidate decisions. It excludes timestamps, absolute paths, secrets, and machine-specific data so equivalent configuration produces byte-identical JSON.
+The real location follows `nuxt.options.buildDir`. The report includes `schemaVersion: 1`, module and `es-toolkit` versions, summary counters, final imports, and candidate decisions. It excludes timestamps, absolute paths, secrets, and machine-specific data. Object fields use a fixed serialization order, surfaces use a documented order, and candidates are ordered by export name within each surface so equivalent configuration produces byte-identical JSON.
 
 Each candidate is identified by `surface + exportName` and receives exactly one status:
 
@@ -165,6 +165,9 @@ Each candidate is identified by `surface + exportName` and receives exactly one 
 
 Stable reason codes include:
 
+- `selected-by-mode`
+- `explicitly-included`
+- `entrypoint-enabled`
 - `default-excluded`
 - `user-excluded`
 - `not-included`
