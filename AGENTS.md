@@ -18,6 +18,10 @@ This project tests supported Node 20 and 24 releases in CI and pins pnpm 10 (see
 - `pnpm test:types`: type-check both the module and playground.
 - `pnpm prepack`: create the publishable module in `dist/`.
 - `pnpm test:package`: validate the built package with publint.
+- `pnpm check:exports`: fail when the committed es-toolkit export catalogue is stale.
+- `pnpm generate:exports`: regenerate the catalogue after updating es-toolkit.
+- `pnpm bench`: capture local setup, import-manifest, and bundle metrics under `.bench/`.
+- `pnpm bench:compare -- --baseline <file> --candidate <file> --profile v2.1`: enforce v2.1 performance gates.
 
 Run one test with `pnpm vitest run test/options.test.ts` or filter by name with `pnpm vitest run -t "renders the index page"`.
 
