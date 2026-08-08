@@ -4,6 +4,8 @@ import {
   normalizeToolkitImports,
   summarize,
 } from '../bench/metrics.mjs'
+import { parseCompareArgs } from '../bench/compare.mjs'
+import { parseBenchmarkArgs } from '../bench/run.mjs'
 
 describe('benchmark metrics', () => {
   it('calculates stable median and p95 values', () => {
@@ -47,5 +49,66 @@ describe('benchmark metrics', () => {
       expect.objectContaining({ name: 'client-bundle', passed: true }),
       expect.objectContaining({ name: 'server-bundle', passed: true }),
     ])
+  })
+
+  it('parses benchmark capture arguments', () => {
+    expect(parseBenchmarkArgs([
+      '--root', '/repo',
+      '--label', 'baseline',
+      '--output', '/repo/.bench/baseline.json',
+      '--runs', '20',
+      '--prepare-runs', '5',
+    ])).toEqual({
+      root: '/repo',
+      label: 'baseline',
+      output: '/repo/.bench/baseline.json',
+      runs: 20,
+      prepareRuns: 5,
+    })
+  })
+
+  it('ignores pnpm argument separators when parsing capture arguments', () => {
+    expect(parseBenchmarkArgs([
+      '--root', '/repo',
+      '--label', 'current',
+      '--output', '/repo/.bench/current.json',
+      '--',
+      '--label', 'baseline',
+      '--output', '/repo/.bench/baseline.json',
+    ])).toMatchObject({
+      label: 'baseline',
+      output: '/repo/.bench/baseline.json',
+    })
+  })
+
+  it('ignores pnpm argument separators when parsing comparison arguments', () => {
+    expect(parseCompareArgs([
+      '--',
+      '--baseline', '/repo/.bench/baseline.json',
+      '--candidate', '/repo/.bench/candidate.json',
+      '--profile', 'v2.1',
+    ])).toEqual({
+      baseline: '/repo/.bench/baseline.json',
+      candidate: '/repo/.bench/candidate.json',
+      profile: 'v2.1',
+    })
+  })
+
+  it('reports a failed reduction gate', () => {
+    const baseline = {
+      moduleLoad: { incrementalMs: { median: 100 }, incrementalRssMiB: { median: 20 } },
+      imports: [],
+      bundles: { client: { rawBytes: 1000 }, server: { rawBytes: 2000 } },
+    }
+    const candidate = {
+      moduleLoad: { incrementalMs: { median: 40 }, incrementalRssMiB: { median: 11 } },
+      imports: [],
+      bundles: { client: { rawBytes: 1000 }, server: { rawBytes: 2000 } },
+    }
+
+    expect(evaluateV21Gates(baseline, candidate)[0]).toEqual({
+      name: 'cold-import-reduction',
+      passed: false,
+    })
   })
 })

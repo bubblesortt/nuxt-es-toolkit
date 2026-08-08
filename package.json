@@ -59,6 +59,8 @@
     "dev": "pnpm dev:prepare && nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
+    "bench": "node bench/run.mjs --root . --label current --output .bench/current.json",
+    "bench:compare": "node bench/compare.mjs",
     "check": "pnpm dev:prepare && pnpm lint && pnpm test && pnpm test:types && pnpm dev:build && pnpm prepack && pnpm test:package",
     "release": "pnpm check && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
