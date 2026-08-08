@@ -1,6 +1,6 @@
 {
   "name": "@bubblesortt/nuxt-es-toolkit",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Es-toolkit auto import module for Nuxt",
   "keywords": [
     "nuxt",
@@ -51,7 +51,8 @@
   },
   "files": [
     "dist",
-    "MIGRATION.md"
+    "MIGRATION.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "nuxt-module-build build",

@@ -1,5 +1,25 @@
 # Changelog
 
+## v2.1.0
+
+[compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v2.0.0...v2.1.0)
+
+### Performance
+
+- Stop evaluating the full base, compat, FP, Map, and Set `es-toolkit` runtime surfaces during Nuxt module setup; import planning now reads a generated export-name catalogue
+- Reduce median cold module import from 85.884 ms to 0.250 ms (-99.71%) and incremental RSS from 17.156 MiB to 0.234 MiB (-98.64%) in the local paired v2.0.0 benchmark on Node 25.9.0
+- Reduce median Nuxt prepare time from 1,587.705 ms to 1,543.368 ms (-2.79%) and p95 from 3,238.141 ms to 1,590.925 ms (-50.87%) in the same benchmark
+
+### Compatibility
+
+- Preserve all 185 generated auto-imports, their names, sources, aliases, prefixes, exclusions, validation behavior, and optional entrypoint selection from v2.0.0
+- Keep the client and server raw bundle sizes unchanged; the optimization affects module setup only and does not change application runtime behavior
+
+### Validation
+
+- Add catalogue drift, built-module output, and paired performance checks so new `es-toolkit` exports cannot silently change the published auto-import surface
+- Add a Node 24 CI benchmark that requires at least 70% lower cold-import time, at least 50% lower incremental RSS, identical generated imports, and no more than 1% bundle-size growth
+
 ## v2.0.0
 
 [compare changes](https://github.com/BubbleSortt/nuxt-es-toolkit/compare/v1.2.0...v2.0.0)
