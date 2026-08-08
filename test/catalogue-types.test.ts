@@ -12,5 +12,11 @@ describe('generated method types', () => {
     expectTypeOf<'fp.map'>().toExtend<ToolkitMethod>()
     expectTypeOf<'map.filter'>().toExtend<ToolkitMethod>()
     expectTypeOf<'set.map'>().toExtend<ToolkitMethod>()
+
+    expectTypeOf<Extract<BaseToolkitMethod, 'chunk'>>().toEqualTypeOf<'chunk'>()
+    expectTypeOf<Extract<CompatToolkitMethod, 'add'>>().toEqualTypeOf<'add'>()
+    expectTypeOf<Extract<ToolkitMethod, 'fp.map'>>().toEqualTypeOf<'fp.map'>()
+    expectTypeOf<Extract<ToolkitMethod, 'map.filter'>>().toEqualTypeOf<'map.filter'>()
+    expectTypeOf<Extract<ToolkitMethod, 'set.map'>>().toEqualTypeOf<'set.map'>()
   })
 })
