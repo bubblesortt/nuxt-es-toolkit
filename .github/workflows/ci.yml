@@ -32,6 +32,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check export catalogue
+        run: pnpm check:exports
+
       - name: Prepare playground
         run: pnpm dev:prepare
 
@@ -49,6 +52,9 @@ jobs:
 
       - name: Build package
         run: pnpm prepack
+
+      - name: Check module output
+        run: pnpm check:module-output
 
       - name: Validate package
         run: pnpm test:package
@@ -76,6 +82,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Check export catalogue
+        run: pnpm check:exports
 
       - name: Select Nuxt ${{ matrix.nuxt }}
         run: pnpm add --save-dev --lockfile=false nuxt@${{ matrix.nuxt }}

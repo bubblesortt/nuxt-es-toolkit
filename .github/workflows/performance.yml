@@ -1,0 +1,93 @@
+name: performance
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/**
+      - bench/**
+      - scripts/**
+      - test/**
+      - package.json
+      - pnpm-lock.yaml
+      - .github/workflows/performance.yml
+  workflow_dispatch:
+    inputs:
+      baseline_ref:
+        description: Git ref to compare against
+        required: true
+        default: v2.0.0
+
+permissions:
+  contents: read
+
+concurrency:
+  group: performance-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve baseline ref
+        id: baseline
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          INPUT_BASELINE_REF: ${{ inputs.baseline_ref }}
+        run: echo "ref=${PR_BASE_SHA:-$INPUT_BASELINE_REF}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ steps.baseline.outputs.ref }}
+          path: baseline
+
+      - name: Checkout candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: candidate
+
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          package_json_file: candidate/package.json
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: 24.14.0
+          cache: pnpm
+          cache-dependency-path: candidate/pnpm-lock.yaml
+
+      - name: Install baseline
+        run: pnpm --dir baseline install --frozen-lockfile
+
+      - name: Prepare baseline
+        run: pnpm --dir baseline dev:prepare
+
+      - name: Install candidate
+        run: pnpm --dir candidate install --frozen-lockfile
+
+      - name: Prepare candidate
+        run: pnpm --dir candidate dev:prepare
+
+      - name: Build baseline package
+        run: pnpm --dir baseline prepack
+
+      - name: Build candidate package
+        run: pnpm --dir candidate prepack
+
+      - name: Capture baseline
+        run: node candidate/bench/run.mjs --root baseline --label baseline --output candidate/.bench/baseline.json --runs 20 --prepare-runs 5
+
+      - name: Capture candidate
+        run: node candidate/bench/run.mjs --root candidate --label candidate --output candidate/.bench/candidate.json --runs 20 --prepare-runs 5
+
+      - name: Compare results
+        run: node candidate/bench/compare.mjs --baseline candidate/.bench/baseline.json --candidate candidate/.bench/candidate.json --profile v2.1 | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: performance-results
+          path: candidate/.bench/*.json

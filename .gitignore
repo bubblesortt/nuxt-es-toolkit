@@ -28,6 +28,7 @@ dist
 .env
 
 # Testing
+.bench
 reports
 coverage
 *.lcov

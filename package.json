@@ -1,6 +1,6 @@
 {
   "name": "@bubblesortt/nuxt-es-toolkit",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Es-toolkit auto import module for Nuxt",
   "keywords": [
     "nuxt",
@@ -51,7 +51,8 @@
   },
   "files": [
     "dist",
-    "MIGRATION.md"
+    "MIGRATION.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "nuxt-module-build build",
@@ -59,7 +60,12 @@
     "dev": "pnpm dev:prepare && nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "check": "pnpm dev:prepare && pnpm lint && pnpm test && pnpm test:types && pnpm dev:build && pnpm prepack && pnpm test:package",
+    "bench": "pnpm dev:prepare && pnpm prepack && node bench/run.mjs --root . --label current --output .bench/current.json",
+    "bench:compare": "node bench/compare.mjs",
+    "generate:exports": "node scripts/export-catalogue.mjs --write",
+    "check:exports": "node scripts/export-catalogue.mjs --check",
+    "check:module-output": "node scripts/check-module-output.mjs",
+    "check": "pnpm check:exports && pnpm dev:prepare && pnpm lint && pnpm test && pnpm test:types && pnpm dev:build && pnpm prepack && pnpm check:module-output && pnpm test:package",
     "release": "pnpm check && changelogen --release && npm publish && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
@@ -84,6 +90,7 @@
     "publint": "^0.3.23",
     "typescript": "~5.9.3",
     "vitest": "^4.1.10",
-    "vue-tsc": "^3.3.9"
+    "vue-tsc": "^3.3.9",
+    "yaml": "^2.9.0"
   }
 }

@@ -1,21 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { planImports, type PlanImportsOptions } from '../src/utils/imports'
 
-const base = {
-  chunk: () => {},
-  head: () => {},
-  isNotNil: () => {},
-}
-const compat = {
-  add: () => {},
-  chunk: () => {},
-}
-const fp = {
-  map: () => {},
-}
-const map = {
-  filter: () => {},
-}
+const base = ['chunk', 'head', 'isNotNil']
+const compat = ['add', 'chunk']
+const fp = ['map']
+const map = ['filter']
 
 const createOptions = (overrides: Partial<PlanImportsOptions> = {}): PlanImportsOptions => ({
   compatMode: 'prefer',
