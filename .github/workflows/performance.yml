@@ -59,8 +59,14 @@ jobs:
       - name: Install baseline
         run: pnpm --dir baseline install --frozen-lockfile
 
+      - name: Prepare baseline
+        run: pnpm --dir baseline dev:prepare
+
       - name: Install candidate
         run: pnpm --dir candidate install --frozen-lockfile
+
+      - name: Prepare candidate
+        run: pnpm --dir candidate dev:prepare
 
       - name: Build baseline package
         run: pnpm --dir baseline prepack

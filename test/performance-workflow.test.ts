@@ -134,8 +134,22 @@ describe('performance workflow', () => {
 
     expect(findStep(steps, 'Install baseline').run).toBe('pnpm --dir baseline install --frozen-lockfile')
     expect(findStep(steps, 'Install candidate').run).toBe('pnpm --dir candidate install --frozen-lockfile')
+    expect(findStep(steps, 'Prepare baseline').run).toBe('pnpm --dir baseline dev:prepare')
+    expect(findStep(steps, 'Prepare candidate').run).toBe('pnpm --dir candidate dev:prepare')
     expect(findStep(steps, 'Build baseline package').run).toBe('pnpm --dir baseline prepack')
     expect(findStep(steps, 'Build candidate package').run).toBe('pnpm --dir candidate prepack')
+    expect(steps.findIndex(step => step.name === 'Install baseline')).toBeLessThan(
+      steps.findIndex(step => step.name === 'Prepare baseline'),
+    )
+    expect(steps.findIndex(step => step.name === 'Prepare baseline')).toBeLessThan(
+      steps.findIndex(step => step.name === 'Build baseline package'),
+    )
+    expect(steps.findIndex(step => step.name === 'Install candidate')).toBeLessThan(
+      steps.findIndex(step => step.name === 'Prepare candidate'),
+    )
+    expect(steps.findIndex(step => step.name === 'Prepare candidate')).toBeLessThan(
+      steps.findIndex(step => step.name === 'Build candidate package'),
+    )
     expect(findStep(steps, 'Capture baseline').run).toBe(
       'node candidate/bench/run.mjs --root baseline --label baseline --output candidate/.bench/baseline.json --runs 20 --prepare-runs 5',
     )
