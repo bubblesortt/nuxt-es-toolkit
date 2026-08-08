@@ -231,7 +231,6 @@ export const compatExports = [
   'curryRight',
   'debounce',
   'deburr',
-  'default',
   'defaultTo',
   'defaults',
   'defaultsDeep',

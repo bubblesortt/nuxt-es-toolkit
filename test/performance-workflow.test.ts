@@ -122,6 +122,9 @@ describe('performance workflow', () => {
 
     expect(steps.find(step => step.uses?.startsWith('pnpm/action-setup@'))).toMatchObject({
       uses: 'pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa',
+      with: {
+        package_json_file: 'candidate/package.json',
+      },
     })
     expect(steps.find(step => step.uses?.startsWith('actions/setup-node@'))).toMatchObject({
       uses: 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020',

@@ -45,13 +45,24 @@ const listFiles = directory => readdirSync(directory, { withFileTypes: true }).f
 
 export const measureBundleDirectory = (directory, extensions) => {
   const files = listFiles(directory).filter(path => extensions.includes(extname(path)))
-  return files.reduce((metric, path) => {
+  if (files.length === 0) {
+    throw new Error(`No bundle files with extensions ${extensions.join(', ')} found in ${directory}.`)
+  }
+
+  const metric = files.reduce((metric, path) => {
     const contents = readFileSync(path)
     metric.files += 1
     metric.rawBytes += statSync(path).size
     metric.gzipBytes += gzipSync(contents).length
     return metric
   }, { files: 0, rawBytes: 0, gzipBytes: 0 })
+
+  for (const field of ['files', 'rawBytes', 'gzipBytes']) {
+    if (!Number.isFinite(metric[field]) || metric[field] <= 0) {
+      throw new Error(`Invalid bundle measurement for ${directory}: ${field} must be greater than 0, received ${metric[field]}.`)
+    }
+  }
+  return metric
 }
 
 const reduction = (baseline, candidate) => (baseline - candidate) / baseline

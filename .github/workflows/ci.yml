@@ -53,6 +53,9 @@ jobs:
       - name: Build package
         run: pnpm prepack
 
+      - name: Check module output
+        run: pnpm check:module-output
+
       - name: Validate package
         run: pnpm test:package
 

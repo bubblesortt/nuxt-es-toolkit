@@ -38,6 +38,16 @@ const run = (command, args, options) => {
   return result.stdout
 }
 
+export const getPrepareTimeFlag = (platform) => {
+  if (platform === 'linux') {
+    return '-v'
+  }
+  if (platform === 'darwin') {
+    return '-l'
+  }
+  throw new Error(`Unsupported prepare RSS platform: ${platform}. Supported platforms are linux and darwin.`)
+}
+
 const measureColdImport = (specifier, root) => {
   const script = [
     'const beforeRss = process.memoryUsage().rss',
@@ -79,22 +89,21 @@ const measureModuleLoad = (root, runs) => {
   }
 }
 
-const parseMaximumRss = (output) => {
-  const match = process.platform === 'linux'
+const parseMaximumRss = (output, platform) => {
+  const match = platform === 'linux'
     ? output.match(/Maximum resident set size \(kbytes\):\s+(\d+)/)
     : output.match(/(\d+)\s+maximum resident set size/)
   if (!match) {
     throw new Error('Could not parse maximum RSS from /usr/bin/time output.')
   }
   const value = Number(match[1])
-  return process.platform === 'linux' ? value / 1024 : value / 1024 / 1024
+  return platform === 'linux' ? value / 1024 : value / 1024 / 1024
 }
 
-const measurePrepare = (root, runs) => {
-  const command = process.platform === 'linux' ? '-v' : '-l'
+const measurePrepare = (root, runs, platform, timeFlag) => {
   const sample = () => {
     const startedAt = performance.now()
-    const result = spawnSync('/usr/bin/time', [command, 'pnpm', 'exec', 'nuxi', 'prepare', 'playground'], {
+    const result = spawnSync('/usr/bin/time', [timeFlag, 'pnpm', 'exec', 'nuxi', 'prepare', 'playground'], {
       cwd: root,
       encoding: 'utf8',
     })
@@ -103,7 +112,7 @@ const measurePrepare = (root, runs) => {
     }
     return {
       elapsedMs: performance.now() - startedAt,
-      maxRssMiB: parseMaximumRss(result.stderr),
+      maxRssMiB: parseMaximumRss(result.stderr, platform),
     }
   }
 
@@ -118,10 +127,12 @@ const measurePrepare = (root, runs) => {
 }
 
 export const captureBenchmark = (options) => {
+  const platform = options.platform ?? process.platform
+  const prepareTimeFlag = getPrepareTimeFlag(platform)
   const root = resolve(options.root)
   const output = resolve(options.output)
   const moduleLoad = measureModuleLoad(root, options.runs)
-  const prepare = measurePrepare(root, options.prepareRuns)
+  const prepare = measurePrepare(root, options.prepareRuns, platform, prepareTimeFlag)
   run('pnpm', ['dev:build'], { cwd: root })
 
   const declarationCandidates = [
@@ -142,7 +153,7 @@ export const captureBenchmark = (options) => {
     label: options.label,
     environment: {
       gitSha: run('git', ['rev-parse', 'HEAD'], { cwd: root }).trim(),
-      platform: process.platform,
+      platform,
       architecture: process.arch,
       node: process.version,
       pnpm: run('pnpm', ['--version'], { cwd: root }).trim(),

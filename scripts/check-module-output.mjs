@@ -1,13 +1,23 @@
 import { readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import ts from 'typescript'
 
 const modulePath = resolve(dirname(fileURLToPath(import.meta.url)), '../dist/module.mjs')
 
 export const assertNoEagerRuntimeImports = (code) => {
-  const eagerImport = /import \* as \w+ from ['"][^'"]*runtime\/es-toolkit-/
-  if (eagerImport.test(code)) {
-    throw new Error('Built module eagerly imports an es-toolkit runtime barrel.')
+  const sourceFile = ts.createSourceFile('module.mjs', code, ts.ScriptTarget.Latest, false, ts.ScriptKind.JS)
+  for (const statement of sourceFile.statements) {
+    if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) {
+      continue
+    }
+
+    const source = statement.moduleSpecifier.text
+    const isPackageImport = source === 'es-toolkit' || source.startsWith('es-toolkit/')
+    const isRuntimeBarrelImport = /(?:^|\/)runtime\/es-toolkit-[^/?#]+(?:[?#].*)?$/.test(source)
+    if (isPackageImport || isRuntimeBarrelImport) {
+      throw new Error(`Static import from ${source} eagerly loads es-toolkit during module setup.`)
+    }
   }
 }
 

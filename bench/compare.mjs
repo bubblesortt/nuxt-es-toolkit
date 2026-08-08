@@ -23,15 +23,70 @@ export const parseCompareArgs = (argv) => {
 
 const readBenchmark = path => JSON.parse(readFileSync(path, 'utf8'))
 
+const environmentFields = ['platform', 'architecture', 'node', 'pnpm', 'nuxt', 'esToolkit']
+const bundleSurfaces = ['client', 'server']
+const bundleMetrics = ['files', 'rawBytes', 'gzipBytes']
+const readField = (value, path) => path.split('.').reduce((current, key) => current?.[key], value)
+const formatValue = value => typeof value === 'string' ? JSON.stringify(value) : String(value)
+
+const assertFiniteNumber = (name, benchmark, field, comparison, expectation) => {
+  const value = readField(benchmark, field)
+  if (typeof value !== 'number' || !Number.isFinite(value) || !comparison(value)) {
+    throw new Error(
+      `Invalid ${name}.${field}: expected a finite number ${expectation}, received ${formatValue(value)}.`,
+    )
+  }
+}
+
+export const validateV21Benchmarks = (baseline, candidate) => {
+  for (const [name, benchmark] of [['baseline', baseline], ['candidate', candidate]]) {
+    if (benchmark.schemaVersion !== 1) {
+      throw new Error(`Invalid ${name}.schemaVersion: expected 1, received ${formatValue(benchmark.schemaVersion)}.`)
+    }
+  }
+
+  if (!Array.isArray(baseline.imports)) {
+    throw new TypeError('Invalid baseline.imports: expected an array.')
+  }
+  if (!Array.isArray(candidate.imports) || candidate.imports.length !== 185) {
+    throw new Error(`Invalid candidate.imports.length: expected 185, received ${formatValue(candidate.imports?.length)}.`)
+  }
+
+  assertFiniteNumber('baseline', baseline, 'moduleLoad.incrementalMs.median', value => value > 0, 'greater than 0')
+  assertFiniteNumber('baseline', baseline, 'moduleLoad.incrementalRssMiB.median', value => value > 0, 'greater than 0')
+  assertFiniteNumber('candidate', candidate, 'moduleLoad.incrementalMs.median', value => value >= 0, 'greater than or equal to 0')
+  assertFiniteNumber('candidate', candidate, 'moduleLoad.incrementalRssMiB.median', value => value >= 0, 'greater than or equal to 0')
+
+  for (const [name, benchmark] of [['baseline', baseline], ['candidate', candidate]]) {
+    for (const surface of bundleSurfaces) {
+      for (const metric of bundleMetrics) {
+        const field = `bundles.${surface}.${metric}`
+        assertFiniteNumber(name, benchmark, field, value => value > 0, 'greater than 0')
+      }
+    }
+  }
+
+  for (const field of environmentFields) {
+    const baselineValue = baseline.environment?.[field]
+    const candidateValue = candidate.environment?.[field]
+    if (typeof baselineValue !== 'string' || baselineValue.length === 0) {
+      throw new Error(`Invalid baseline.environment.${field}: expected a non-empty string.`)
+    }
+    if (typeof candidateValue !== 'string' || candidateValue.length === 0) {
+      throw new Error(`Invalid candidate.environment.${field}: expected a non-empty string.`)
+    }
+    if (baselineValue !== candidateValue) {
+      throw new Error(
+        `Benchmark environment mismatch for environment.${field}: baseline ${formatValue(baselineValue)}, candidate ${formatValue(candidateValue)}.`,
+      )
+    }
+  }
+}
+
 export const compare = (options) => {
   const baseline = readBenchmark(options.baseline)
   const candidate = readBenchmark(options.candidate)
-  if (baseline.schemaVersion !== 1 || candidate.schemaVersion !== 1) {
-    throw new Error('Benchmark schema version must be 1.')
-  }
-  if (candidate.imports.length !== 185) {
-    throw new Error(`Expected 185 normalized imports, received ${candidate.imports.length}.`)
-  }
+  validateV21Benchmarks(baseline, candidate)
 
   const gates = evaluateV21Gates(baseline, candidate)
   console.log([

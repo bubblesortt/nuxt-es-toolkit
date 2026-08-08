@@ -11,7 +11,9 @@ const surfaceSpecifiers = {
 }
 
 const outputPath = resolve(dirname(fileURLToPath(import.meta.url)), '../src/generated/es-toolkit-exports.ts')
-const exportNames = module => Object.keys(module).sort()
+const exportNames = module => Object.keys(module)
+  .filter(name => name !== 'default')
+  .sort()
 const quote = value => `'${value.replaceAll('\\', '\\\\').replaceAll(/'/g, '\\$&')}'`
 
 export const discoverExportCatalogue = async () => {

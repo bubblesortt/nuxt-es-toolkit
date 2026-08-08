@@ -198,6 +198,7 @@ Aliases and exclusions also use qualified names, such as `alias: [['fp.map', 'fu
 - During setup, the module reads a generated catalogue of `es-toolkit` export names instead of evaluating utility implementations while loading `nuxt.config`.
 - Application imports still resolve through package-owned ESM barrels and remain tree-shakeable, so only referenced utilities are bundled.
 - After changing the `es-toolkit` dependency, maintainers must run `pnpm generate:exports` to regenerate the catalogue and `pnpm check:exports` before committing.
+- Maintainers can capture local metrics with `pnpm bench -- --label <label> --output .bench/<label>.json`; the command prepares and builds the module first. Prepare RSS sampling supports Linux and macOS only, and rejects other platforms.
 
 ## ✅ Compatibility
 
