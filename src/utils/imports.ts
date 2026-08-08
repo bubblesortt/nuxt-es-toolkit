@@ -1,23 +1,21 @@
 export type CompatMode = 'prefer' | 'only' | false
 
-export interface ToolkitModule {
-  [name: string]: unknown
-}
-
 export interface ImportEntries {
   compat: string
   base: string
 }
 
 export interface ImportSurfaces {
-  compat: ToolkitModule
-  base: ToolkitModule
+  compat: readonly string[]
+  base: readonly string[]
 }
 
+export type EntrypointName = 'fp' | 'map' | 'set'
+
 export interface EntrypointSurface {
-  name: string
+  name: EntrypointName
   enabled: boolean
-  exports: ToolkitModule
+  exports: readonly string[]
   entry: string
 }
 
@@ -118,8 +116,8 @@ const validateMethods = (
 }
 
 export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
-  const baseExports = new Set(Object.keys(options.surfaces.base))
-  const compatExports = new Set(Object.keys(options.surfaces.compat))
+  const baseExports = new Set(options.surfaces.base)
+  const compatExports = new Set(options.surfaces.compat)
   const availableExports = new Set([...baseExports, ...compatExports])
   const compatMethods = new Set(options.compatMethods)
   const baseMethods = new Set(options.baseMethods)
@@ -168,7 +166,7 @@ export const planImports = (options: PlanImportsOptions): PlannedImport[] => {
     }
     entrypointNames.add(entrypoint.name)
 
-    for (const name of Object.keys(entrypoint.exports)) {
+    for (const name of entrypoint.exports) {
       const key = `${entrypoint.name}.${name}`
       knownQualifiedMethods.set(key, entrypoint.name)
       if (entrypoint.enabled) {
