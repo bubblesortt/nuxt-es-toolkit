@@ -178,17 +178,17 @@ export default defineNuxtModule<ModuleOptions>({
     const imports = planImports({
       compatMode,
       surfaces: {
-        compat: toolkitCompatAll,
-        base: toolkitBase,
+        compat: Object.keys(toolkitCompatAll),
+        base: Object.keys(toolkitBase),
       },
       entries: {
         compat: compatEntry,
         base: baseEntry,
       },
       entrypoints: [
-        { name: 'fp', enabled: entrypoints.has('fp'), exports: toolkitFp, entry: fpEntry },
-        { name: 'map', enabled: entrypoints.has('map'), exports: toolkitMap, entry: mapEntry },
-        { name: 'set', enabled: entrypoints.has('set'), exports: toolkitSet, entry: setEntry },
+        { name: 'fp', enabled: entrypoints.has('fp'), exports: Object.keys(toolkitFp), entry: fpEntry },
+        { name: 'map', enabled: entrypoints.has('map'), exports: Object.keys(toolkitMap), entry: mapEntry },
+        { name: 'set', enabled: entrypoints.has('set'), exports: Object.keys(toolkitSet), entry: setEntry },
       ],
       compatMethods: toArray(_options.compatMethods || []),
       baseMethods: toArray(_options.baseMethods || []),
